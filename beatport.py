@@ -1,11 +1,9 @@
 import logging
-import os
-import shutil
 
 from bs4 import BeautifulSoup
 
 from common import clear_artists_name
-from models import BeatportArtistModel, BeatportTrackModel, PlaylistModel
+from models import BeatportArtistModel, BeatportTrackModel, BeatportPlaylistModel
 
 logger = logging.getLogger("beatport")
 logger.setLevel(logging.INFO)
@@ -28,11 +26,6 @@ def get_playlist_data(file_path: str) -> BeautifulSoup:
 
 def check_file(file_path: str) -> bool:
     return bool(get_playlist_data(file_path).find(class_="library-playlist__info"))
-
-
-def clear_dir(dir_path: str):
-    shutil.rmtree(dir_path)
-    os.makedirs(dir_path)
 
 
 def find_playlist_name(soup: BeautifulSoup) -> str:
@@ -97,7 +90,7 @@ def find_tracks(soup: BeautifulSoup) -> list[BeatportTrackModel]:
     ]
 
 
-def collect_playlist(html_path: str) -> PlaylistModel:
+def collect_playlist(html_path: str) -> BeatportPlaylistModel:
     playlist_soup = get_playlist_data(html_path)
     playlist_name = find_playlist_name(playlist_soup)
     tracks_count = find_count(playlist_soup)
@@ -107,7 +100,7 @@ def collect_playlist(html_path: str) -> PlaylistModel:
             f"Full playlist '{playlist_name}' in '{html_path}' contains {tracks_count} tracks. "
             f"But in file - {len(tracks)}"
         )
-    playlist = PlaylistModel(
+    playlist = BeatportPlaylistModel(
         title=playlist_name, tracks_count=tracks_count, tracks=tracks
     )
     return playlist

@@ -1,8 +1,11 @@
 import logging
+import os
+import shutil
 from pathlib import Path
 from environs import Env
 
 from beatport import check_file, collect_playlist
+from spotify import create_sp, create_playlist_for_bp
 
 PLAYLIST_HTML_PATH = "data/Playlists"
 
@@ -29,9 +32,15 @@ def get_playlist_files(dir_path: str) -> list[str]:
     ]
 
 
+def clear_dir(dir_path: str):
+    shutil.rmtree(dir_path)
+    os.makedirs(dir_path)
+
+
 def main():
     env = Env()
     env.read_env()
+    sp = create_sp()
     playlist_files = get_playlist_files(PLAYLIST_HTML_PATH)
     logger.info(f"Found playlists: {playlist_files}")
     try:
@@ -43,7 +52,11 @@ def main():
             f"Collected {len(playlists)} playlists "
             f"{[f'{pl.title} :: {pl.tracks_count} tracks' for pl in playlists]}"
         )
-        # clear_dir(PLAYLIST_HTML_PATH)
+        clear_dir(PLAYLIST_HTML_PATH)
+
+        for playlist in playlists:
+            new_playlist = create_playlist_for_bp(sp, playlist)
+            logger.info(f"Create Spotify playlist :: {new_playlist}")
 
 
 if __name__ == "__main__":

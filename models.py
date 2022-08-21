@@ -32,6 +32,12 @@ class BeatportTrackModel(TrackModel):
     bpm: int | None
 
 
+class BeatportPlaylistModel(BaseModel):
+    title: str
+    tracks_count: int
+    tracks: list[BeatportTrackModel] | None
+
+
 class SpotifyArtistModel(BeatportArtistModel):
     pass
 

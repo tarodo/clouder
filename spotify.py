@@ -5,7 +5,7 @@ from spotipy import Spotify, SpotifyOAuth
 
 from common import clear_artists_name
 from models import (BeatportTrackModel,
-                    SpotifyArtistModel, SpotifyTrackModel)
+                    SpotifyArtistModel, SpotifyTrackModel, PlaylistModel, BeatportPlaylistModel)
 
 logger = logging.getLogger("spotify")
 logger.setLevel(logging.DEBUG)
@@ -77,9 +77,27 @@ def search_track_for_bp(sp: Spotify, track_bp: BeatportTrackModel) -> SpotifyTra
             return track_sp
         tracks_sp.append(track_sp)
 
-    logger.info(f"Didn't find track :: '{track_bp.title}' :: id :: {track_bp.id}")
+    artists_sp = [artist.name for artist in track_bp.artists]
+    logger.info(f"Didn't find track :: '{track_bp.title} - {' '.join(artists_sp)}' :: id :: {track_bp.id}")
     for track_sp in tracks_sp:
         logger.info(
             f"Track BP {track_bp.id} : found : {track_sp.title} :: "
             f"{[artist.name for artist in track_sp.artists]} :: {track_sp.url}"
         )
+
+
+def create_playlist(sp: Spotify, title: str) -> (str, str):
+    user_id = sp.me()["id"]
+    playlist = sp.user_playlist_create(user_id, title)
+    return playlist["id"], playlist["external_urls"]["spotify"]
+
+
+def create_playlist_for_bp(sp: Spotify, playlist_bp: BeatportPlaylistModel) -> str:
+    playlist_id, playlist_url = create_playlist(sp, playlist_bp.title)
+    tracks_ids = []
+    for track_bp in playlist_bp.tracks:
+        track_sp = search_track_for_bp(sp, track_bp)
+        if track_sp:
+            tracks_ids.append(track_sp.id)
+    sp.playlist_add_items(playlist_id, tracks_ids)
+    return playlist_url
