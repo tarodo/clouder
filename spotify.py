@@ -1,12 +1,10 @@
 import logging
 import re
-from pprint import pprint
 
-from environs import Env
 from spotipy import Spotify, SpotifyOAuth
 
 from common import clear_artists_name
-from models import (BeatportArtistModel, BeatportTrackModel,
+from models import (BeatportTrackModel,
                     SpotifyArtistModel, SpotifyTrackModel)
 
 logger = logging.getLogger("spotify")
