@@ -1,0 +1,11 @@
+.idea/
+venv/
+data/
+dist/
+build/
+*.spec
+logs.txt
+__pycache__/
+*.exe
+release/
+*.zip
