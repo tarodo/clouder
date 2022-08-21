@@ -5,6 +5,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
+from common import clear_artists_name
 from models import BeatportArtistModel, BeatportTrackModel, PlaylistModel
 
 logger = logging.getLogger("beatport")
@@ -18,7 +19,7 @@ handler_st.setFormatter(formatter)
 logger.addHandler(handler_st)
 
 PLAYLIST_DEFAULT_NAME = "Default Heap"
-PLAYLIST_HTML_PATH = "../data/Playlists"
+PLAYLIST_HTML_PATH = "data/Playlists"
 
 
 def get_playlist_data(file_path: str) -> BeautifulSoup:
@@ -54,10 +55,6 @@ def find_playlist_name(soup: BeautifulSoup) -> str:
     return playlist_name
 
 
-def clear_artists_name(artist_name: str) -> str:
-    return artist_name.strip().lower()
-
-
 def get_author(artist_soup: BeautifulSoup) -> BeatportArtistModel:
     artist_url: str = artist_soup["href"]
     artist_id = artist_url.split("/")[-1]
@@ -71,7 +68,7 @@ def get_author(artist_soup: BeautifulSoup) -> BeatportArtistModel:
 
 
 def get_track(track_soup: BeautifulSoup) -> BeatportTrackModel:
-    title = track_soup.find(class_="track-title").text
+    title = track_soup.find(class_="track-title__primary").text
     remixed = track_soup.find(class_="track-title__remixed").text
     key = track_soup.find(class_="track-key").text
     bpm = track_soup.find(class_="track-bpm").text
@@ -91,6 +88,7 @@ def get_track(track_soup: BeautifulSoup) -> BeatportTrackModel:
         key=key,
         bpm=bpm,
     )
+    logger.debug(f"Track :: {track}")
     return track
 
 

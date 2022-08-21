@@ -1,2 +1,4 @@
-pydantic
-beautifulsoup4
+pydantic==1.9.2
+beautifulsoup4==4.11.1
+spotipy==2.20.0
+environs==9.5.0

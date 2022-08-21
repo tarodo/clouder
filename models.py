@@ -1,3 +1,5 @@
+from datetime import date
+
 from pydantic import BaseModel
 
 
@@ -8,7 +10,6 @@ class ArtistModel(BaseModel):
 
 class TrackModel(BaseModel):
     title: str
-    artists: list[ArtistModel] | None
 
 
 class PlaylistModel(BaseModel):
@@ -29,3 +30,14 @@ class BeatportTrackModel(TrackModel):
     artists: list[BeatportArtistModel] | None
     key: str | None
     bpm: int | None
+
+
+class SpotifyArtistModel(BeatportArtistModel):
+    pass
+
+
+class SpotifyTrackModel(TrackModel):
+    id: str
+    url: str
+    artists: list[SpotifyArtistModel] | None
+    release_date: date
