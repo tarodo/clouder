@@ -3,7 +3,8 @@ import logging
 from bs4 import BeautifulSoup
 
 from common import clear_artists_name
-from models import BeatportArtistModel, BeatportTrackModel, BeatportPlaylistModel
+from models import (BeatportArtistModel, BeatportPlaylistModel,
+                    BeatportTrackModel)
 
 logger = logging.getLogger("beatport")
 logger.setLevel(logging.INFO)

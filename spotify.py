@@ -4,8 +4,8 @@ import re
 from spotipy import Spotify, SpotifyOAuth
 
 from common import clear_artists_name
-from models import (BeatportTrackModel,
-                    SpotifyArtistModel, SpotifyTrackModel, PlaylistModel, BeatportPlaylistModel)
+from models import (BeatportPlaylistModel, BeatportTrackModel,
+                    SpotifyArtistModel, SpotifyTrackModel)
 
 logger = logging.getLogger("spotify")
 logger.setLevel(logging.DEBUG)
@@ -78,7 +78,9 @@ def search_track_for_bp(sp: Spotify, track_bp: BeatportTrackModel) -> SpotifyTra
         tracks_sp.append(track_sp)
 
     artists_sp = [artist.name for artist in track_bp.artists]
-    logger.info(f"Didn't find track :: '{track_bp.title} - {' '.join(artists_sp)}' :: id :: {track_bp.id}")
+    logger.info(
+        f"Didn't find track :: '{track_bp.title} - {' '.join(artists_sp)}' :: id :: {track_bp.id}"
+    )
     for track_sp in tracks_sp:
         logger.info(
             f"Track BP {track_bp.id} : found : {track_sp.title} :: "
