@@ -1,5 +1,6 @@
 import logging
 import re
+from time import sleep
 
 from spotipy import Spotify, SpotifyOAuth
 
@@ -99,7 +100,11 @@ def create_playlist_for_bp(sp: Spotify, playlist_bp: BeatportPlaylistModel) -> s
     tracks_ids = []
     for track_bp in playlist_bp.tracks:
         track_sp = search_track_for_bp(sp, track_bp)
+        sleep(0.2)
         if track_sp:
             tracks_ids.append(track_sp.id)
-    sp.playlist_add_items(playlist_id, tracks_ids)
+    pack_size = 100
+    parts = [tracks_ids[i * pack_size: (i + 1) * pack_size] for i in range(len(tracks_ids)//pack_size+1)]
+    for part in parts:
+        sp.playlist_add_items(playlist_id, part)
     return playlist_url
