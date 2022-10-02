@@ -1,0 +1,15 @@
+fastapi==0.78.0
+sqlmodel==0.0.6
+uvicorn==0.17.6
+alembic==1.7.7
+pydantic[email]==1.9.1
+environs==9.5.0
+passlib[bcrypt]==1.7.4
+python-jose==3.3.0
+pytest==7.1.2
+requests==2.27.1
+pytest-cov==3.0.0
+python-multipart==0.0.5
+psycopg2-binary
+tenacity==8.0.1
+SQLAlchemy==1.4.35
