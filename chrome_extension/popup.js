@@ -2,40 +2,11 @@ let startSession = document.getElementById("start_session");
 
 startSession.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
     func: testLogin,
   });
 });
-
-async function testLogin() {
-	let details = {
-		'username': 'odmin@main.god',
-		'password': 'kurit'
-	};
-	console.log("We start")
-	let formBody = [];
-	for (const property in details) {
-		const encodedKey = encodeURIComponent(property);
-		const encodedValue = encodeURIComponent(details[property]);
-		formBody.push(encodedKey + "=" + encodedValue);
-	}
-	formBody = formBody.join("&");
-
-	const response = await fetch("http://127.0.0.1:8007/login/access-token", {
-		method: 'POST',
-		headers: {
-			'Accept': 'application/json',
-			'Content-Type': 'application/x-www-form-urlencoded'
-		},
-		body: formBody
-	});
-
-	response.json().then(data => {
-		console.log(data);
-	});
-}
 
 function readAllReleases() {
 	function handleRelease(release) {

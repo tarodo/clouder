@@ -1,10 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">    <title>Title</title>
+    <link href="options.css" rel="stylesheet">
+
 </head>
 <body>
-$END$
+<main class="form-signin">
+  <form>
+    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+    <div id="statusLogin"></div>
+    <div class="form-floating">
+      <input type="email" class="form-control" id="usernameInput">
+      <label for="usernameInput">Email address</label>
+    </div>
+    <div class="form-floating">
+      <input type="password" class="form-control" id="passwordInput">
+      <label for="passwordInput">Password</label>
+    </div>
+
+    <div class="checkbox mb-3">
+      <label>
+        <input type="checkbox" value="remember-me" disabled> Remember me
+      </label>
+    </div>
+    <button class="w-100 btn btn-lg btn-primary" type="submit" id="loginMe">Sign in</button>
+    <p class="mt-5 mb-3 text-muted">&copy; 2017–2021</p>
+  </form>
+</main>
+<script src="options.js"></script>
 </body>
 </html>
