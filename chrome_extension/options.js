@@ -1,3 +1,5 @@
+const api_url = "http://127.0.0.1:8007"
+
 let startSession = document.getElementById("loginMe");
 
 async function LoginMe(username, password) {
@@ -5,6 +7,11 @@ async function LoginMe(username, password) {
 		'username': username,
 		'password': password
 	};
+
+	chrome.storage.sync.get('access_token', function(result) {
+		console.log('Value currently is ' + result.access_token);
+	});
+
 	let formBody = [];
 	for (const property in details) {
 		const encodedKey = encodeURIComponent(property);
@@ -13,7 +20,7 @@ async function LoginMe(username, password) {
 	}
 	formBody = formBody.join("&");
 
-		const response = await fetch("http://127.0.0.1:8007/login/access-token", {
+		const response = await fetch(`${api_url}/login/access-token`, {
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
@@ -21,7 +28,13 @@ async function LoginMe(username, password) {
 			},
 			body: formBody
 		}).then(response => response.json()).then(data => {
-			console.log(data["access_token"])
+			const token = data["access_token"]
+			if (token) {
+				chrome.storage.sync.set({ access_token: data["access_token"] });
+			} else {
+				console.log(data)
+			}
+
 		});
 
 }
