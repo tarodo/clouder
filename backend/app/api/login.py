@@ -34,9 +34,7 @@ def login_access_token(
         raise_400(LoginErrors.IncorrectCredentials)
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    token = security.create_access_token(
-        user.id, expires_delta=access_token_expires
-    )
+    token = security.create_access_token(user.id, expires_delta=access_token_expires)
     return {
         "access_token": token,
         "token_type": "bearer",

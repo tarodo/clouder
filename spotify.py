@@ -104,7 +104,10 @@ def create_playlist_for_bp(sp: Spotify, playlist_bp: BeatportPlaylistModel) -> s
         if track_sp:
             tracks_ids.append(track_sp.id)
     pack_size = 100
-    parts = [tracks_ids[i * pack_size: (i + 1) * pack_size] for i in range(len(tracks_ids)//pack_size+1)]
+    parts = [
+        tracks_ids[i * pack_size : (i + 1) * pack_size]
+        for i in range(len(tracks_ids) // pack_size + 1)
+    ]
     for part in parts:
         sp.playlist_add_items(playlist_id, part)
     return playlist_url
