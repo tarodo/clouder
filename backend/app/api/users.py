@@ -11,15 +11,20 @@ router = APIRouter()
 
 
 class UsersErrors(Enum):
+    UserIsNotAdmin = "User is not admin"
     UserWithEmailExists = "User with Email exists"
 
 
 @router.post("/", response_model=UserOut, status_code=200, responses=responses)
 def create_user(
     payload: UserIn,
+    current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> User:
     """Create One User"""
+    if not current_user.is_admin:
+        raise_400(UsersErrors.UserIsNotAdmin)
+
     old_user = users.read_by_email(db, payload.email)
     if old_user:
         raise_400(UsersErrors.UserWithEmailExists)
