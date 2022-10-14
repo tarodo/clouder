@@ -1,6 +1,6 @@
-from app.models import Style, StyleIn, StyleUpdate
-from sqlmodel import Session, select, SQLModel
 from app.crud import common
+from app.models import Style, StyleIn, StyleUpdate
+from sqlmodel import Session, SQLModel, select
 
 
 def read_by_name(db: Session, name: str) -> Style | None:
@@ -24,4 +24,3 @@ def update(db: Session, db_obj: Style, payload: StyleUpdate) -> SQLModel:
 
 def remove(db: Session, db_obj: Style) -> SQLModel:
     return common.remove(db, db_obj)
-

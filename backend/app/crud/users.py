@@ -1,7 +1,8 @@
 from app.core.security import get_password_hash, verify_password
+from app.crud import common
 from app.models import User, UserIn, UserUpdate
 from fastapi.encoders import jsonable_encoder
-from sqlmodel import Session, select
+from sqlmodel import Session, SQLModel, select
 
 
 def read_by_email(db: Session, email: str) -> User | None:
@@ -11,11 +12,8 @@ def read_by_email(db: Session, email: str) -> User | None:
     return user
 
 
-def read_by_id(db: Session, user_id: int) -> User | None:
-    """Read one user by id"""
-    user = select(User).where(User.id == user_id)
-    user = db.exec(user).one_or_none()
-    return user
+def read_by_id(db: Session, user_id: int) -> SQLModel | None:
+    return common.read_by_id(db, User, user_id)
 
 
 def create(db: Session, payload: UserIn) -> User:
@@ -45,11 +43,8 @@ def update(db: Session, db_obj: User, payload: UserUpdate) -> User:
     return db_obj
 
 
-def remove(db: Session, db_obj: User) -> User:
-    """Remove user from DB"""
-    db.delete(db_obj)
-    db.commit()
-    return db_obj
+def remove(db: Session, db_obj: User) -> SQLModel:
+    return common.remove(db, db_obj)
 
 
 def authenticate(db: Session, email: str, password: str) -> User | None:

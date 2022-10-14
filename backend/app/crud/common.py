@@ -1,6 +1,5 @@
 from fastapi.encoders import jsonable_encoder
-from sqlmodel import Session, select
-from sqlmodel import SQLModel
+from sqlmodel import Session, SQLModel, select
 
 
 def read_by_id(db: Session, Model, elem_id: int) -> SQLModel | None:
