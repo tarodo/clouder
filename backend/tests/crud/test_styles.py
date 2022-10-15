@@ -1,15 +1,62 @@
-import pytest
 from app.crud import styles
-from app.models import StyleIn
-from fastapi.encoders import jsonable_encoder
-from pydantic.error_wrappers import ValidationError
+from app.models import Style, StyleIn, StyleUpdate, User
 from sqlmodel import Session
-from tests.utils.users import create_random_user
 from tests.utils.utils import random_lower_string
 
 
-def test_style_create(db: Session) -> None:
-    style_in = StyleIn(name=random_lower_string(8), base_link=random_lower_string(8))
-    student = styles.create(db, payload=style_in)
-    assert student.name == style_in.name
-    assert student.base_link == style_in.base_link
+def create_random_style(db: Session, user: User) -> Style:
+    style_in = StyleIn(
+        user_id=user.id, name=random_lower_string(8), base_link=random_lower_string(8)
+    )
+    return styles.create(db, payload=style_in)
+
+
+def test_style_create(db: Session, random_user: User) -> None:
+    style_in = StyleIn(
+        user_id=random_user.id,
+        name=random_lower_string(8),
+        base_link=random_lower_string(8),
+    )
+    style = styles.create(db, payload=style_in)
+    assert style.name == style_in.name
+    assert style.base_link == style_in.base_link
+    assert style.user == random_user
+
+
+def test_style_read_by_id(db: Session, random_user: User) -> None:
+    style = create_random_style(db, random_user)
+    test_style = styles.read_by_id(db, style.id)
+    assert test_style == style
+
+
+def test_style_read_by_name(db: Session, random_user: User) -> None:
+    style = create_random_style(db, random_user)
+    test_style = styles.read_by_name(db, style.name)
+    assert test_style == style
+
+
+def test_style_update_name(db, random_user) -> None:
+    style = create_random_style(db, random_user)
+    old_name = style.name
+    style_update_in = StyleUpdate(name=random_lower_string(8))
+    style_updated = styles.update(db, style, style_update_in)
+    assert style_updated == style
+    assert style_updated.name == style_update_in.name
+    assert style_updated.name != old_name
+
+
+def test_style_update_base_link(db, random_user) -> None:
+    style = create_random_style(db, random_user)
+    old_base_link = style.base_link
+    style_update_in = StyleUpdate(base_link=random_lower_string(8))
+    style_updated = styles.update(db, style, style_update_in)
+    assert style_updated == style
+    assert style_updated.base_link == style_update_in.base_link
+    assert style_updated.base_link != old_base_link
+
+
+def test_style_remove(db, random_user) -> None:
+    style = create_random_style(db, random_user)
+    style = styles.remove(db, style)
+    test_style = styles.read_by_id(db, style.id)
+    assert not test_style

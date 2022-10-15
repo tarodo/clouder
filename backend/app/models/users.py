@@ -1,5 +1,5 @@
 from pydantic import EmailStr
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class UserBase(SQLModel):

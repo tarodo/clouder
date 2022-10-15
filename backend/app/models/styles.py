@@ -1,6 +1,5 @@
-from sqlmodel import Field, Relationship, SQLModel
-
 from app.models.users import User
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class StyleBase(SQLModel):
