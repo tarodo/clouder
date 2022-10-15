@@ -1,5 +1,5 @@
 from pydantic import EmailStr
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 
 
 class UserBase(SQLModel):
@@ -10,6 +10,8 @@ class UserBase(SQLModel):
 class User(UserBase, table=True):
     id: int = Field(primary_key=True)
     password: str = Field(...)
+
+    styles: "Style" = Relationship(back_populates="user")
 
 
 class UserIn(UserBase):
