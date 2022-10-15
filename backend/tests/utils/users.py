@@ -37,7 +37,7 @@ def get_authentication_token_from_email(
     password = random_lower_string()
     user = users.read_by_email(db, email=email)
     if not user:
-        user_in_create = UserIn(username=email, email=email, password=password)
+        user_in_create = UserIn(email=email, password=password)
         user = users.create(db, user_in_create)
     else:
         user_in_update = UserUpdate(password=password)
