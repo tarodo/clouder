@@ -4,7 +4,7 @@ from app.api import deps
 from app.api.tools import raise_400
 from app.crud import styles
 from app.models import Style, StyleIn, StyleInApi, StyleOut, User, responses
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from sqlmodel import Session
 
 router = APIRouter()
@@ -24,9 +24,37 @@ def check_to_read(user: User, one_style: Style) -> bool:
     return False
 
 
+create_examples = {
+    "work": {
+        "summary": "A work example",
+        "description": "A **work** item works correctly.",
+        "value": {
+            "name": "New style",
+            "base_link": "bp/style/10332",
+        },
+    },
+    "empty_name": {
+        "summary": "ERROR: empty name",
+        "value": {
+            "name": "",
+            "base_link": "bp/empty_name/10332",
+        },
+    },
+    "empty_base_link": {
+        "summary": "ERROR: empty base link",
+        "value": {
+            "name": "base_link",
+            "base_link": "",
+        },
+    }
+}
+
+
 @router.post("/", response_model=StyleOut, status_code=200, responses=responses)
 def create_style(
-    payload: StyleInApi,
+    payload: StyleInApi = Body(
+        examples=create_examples
+    ),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Style:
