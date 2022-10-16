@@ -28,7 +28,7 @@ def test_wrong_token(client: TestClient) -> None:
     r = client.get(f"/users/me", headers={"Authorization": f"Bearer 1111"})
     current_user = r.json()
     assert r.status_code == 400
-    assert current_user["detail"]["err"] == str(DepsErrors.NotValidCredentials)
+    assert current_user["detail"]["type"] == str(DepsErrors.NotValidCredentials)
 
 
 def test_nonexistent_user(client: TestClient, db: Session) -> None:
@@ -45,7 +45,7 @@ def test_nonexistent_user(client: TestClient, db: Session) -> None:
     r = client.get(f"/users/me", headers=headers)
     current_user = r.json()
     assert r.status_code == 400
-    assert current_user["detail"]["err"] == str(DepsErrors.UserNotFound)
+    assert current_user["detail"]["type"] == str(DepsErrors.UserNotFound)
 
 
 def test_create_user_new_email_admin(
@@ -71,7 +71,7 @@ def test_create_user_new_email_not_admin(
     r = client.post(f"/users/", headers=user_token_headers, json=data)
     created_user = r.json()
     assert 400
-    assert created_user["detail"]["err"] == str(UsersErrors.UserIsNotAdmin)
+    assert created_user["detail"]["type"] == str(UsersErrors.UserIsNotAdmin)
 
 
 def test_create_user_existing_email(
@@ -85,4 +85,4 @@ def test_create_user_existing_email(
     r = client.post(f"/users/", headers=superuser_token_headers, json=data)
     created_user = r.json()
     assert r.status_code == 400
-    assert created_user["detail"]["err"] == str(UsersErrors.UserWithEmailExists)
+    assert created_user["detail"]["type"] == str(UsersErrors.UserWithEmailExists)
