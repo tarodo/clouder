@@ -20,9 +20,12 @@ def test_style_create(
     style = styles.read_by_id(db, created_style["id"])
     assert created_style
     assert style
+    assert created_style["user_id"] == random_user.id
+    assert style.user_id == random_user.id
     assert created_style["name"] == data["name"]
     assert style.name == data["name"]
-    assert style.user_id == random_user.id
+    assert created_style["base_link"] == data["base_link"]
+    assert style.base_link == data["base_link"]
 
 
 def test_style_create_empty_name(
