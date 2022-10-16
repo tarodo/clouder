@@ -46,6 +46,7 @@ def test_style_create_empty_base_link(
     assert r.status_code == 422
 
 
+# TODO: Add tests of creating same styles different users
 def test_style_create_same(
     client: TestClient, db: Session, random_user: User
 ) -> None:
@@ -88,7 +89,7 @@ def test_style_read_by_id_wrong_user(
     style = create_random_style(db, another_user)
     user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
     r = client.get(f"/styles/{style.id}/", headers=user_token_headers)
-    assert 400
+    assert r.status_code == 400
     one_style = r.json()
     assert one_style["detail"]["type"] == str(StylesErrors.UserHasNoAccess)
 
@@ -112,7 +113,7 @@ def test_style_read_by_id_wrong_id(
     wrong_id = style.id + 100
     user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
     r = client.get(f"/styles/{wrong_id}/", headers=user_token_headers)
-    assert 400
+    assert r.status_code == 400
     one_style = r.json()
     assert one_style["detail"]["type"] == str(StylesErrors.UserHasNoAccess)
 
@@ -124,6 +125,137 @@ def test_style_read_by_id_wrong_id_admin(
     style = create_random_style(db, random_user)
     wrong_id = style.id + 100
     r = client.get(f"/styles/{wrong_id}/", headers=superuser_token_headers)
-    assert 400
+    assert r.status_code == 400
     one_style = r.json()
     assert one_style["detail"]["type"] == str(StylesErrors.StyleDoesNotExist)
+
+
+def test_style_update(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    old_style = create_random_style(db, random_user)
+    data = {"name": random_lower_string(8), "base_link": random_lower_string(8)}
+    user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
+    r = client.put(f"/styles/{old_style.id}/", headers=user_token_headers, json=data)
+    assert 200 <= r.status_code < 300
+    updated_style = r.json()
+    assert updated_style["id"] == old_style.id
+    assert updated_style["name"] == data["name"]
+    assert updated_style["base_link"] == data["base_link"]
+
+
+def test_style_update_admin_another(
+    client: TestClient, db: Session, superuser_token_headers
+) -> None:
+    random_user = create_random_user(db)
+    old_style = create_random_style(db, random_user)
+    data = {"name": random_lower_string(8), "base_link": random_lower_string(8)}
+    user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
+    r = client.put(f"/styles/{old_style.id}/", headers=user_token_headers, json=data)
+    assert 200 <= r.status_code < 300
+    updated_style = r.json()
+    assert updated_style["id"] == old_style.id
+    assert updated_style["name"] == data["name"]
+    assert updated_style["base_link"] == data["base_link"]
+
+
+def test_style_update_empty_name(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    old_style = create_random_style(db, random_user)
+    data = {"name": "", "base_link": random_lower_string(8)}
+    user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
+    r = client.put(f"/styles/{old_style.id}/", headers=user_token_headers, json=data)
+    assert r.status_code == 422
+
+
+def test_style_update_empty_link(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    old_style = create_random_style(db, random_user)
+    data = {"name": random_lower_string(8), "base_link": ""}
+    user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
+    r = client.put(f"/styles/{old_style.id}/", headers=user_token_headers, json=data)
+    assert r.status_code == 422
+
+
+def test_style_update_none_name(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    old_style = create_random_style(db, random_user)
+    data = {"base_link": random_lower_string(8)}
+    user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
+    r = client.put(f"/styles/{old_style.id}/", headers=user_token_headers, json=data)
+    assert 200 <= r.status_code < 300
+    updated_style = r.json()
+    assert updated_style["id"] == old_style.id
+    assert updated_style["name"]
+    assert updated_style["name"] == old_style.name
+    assert updated_style["base_link"] == data["base_link"]
+
+
+def test_style_update_none_link(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    old_style = create_random_style(db, random_user)
+    data = {"name": random_lower_string(8)}
+    user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
+    r = client.put(f"/styles/{old_style.id}/", headers=user_token_headers, json=data)
+    assert 200 <= r.status_code < 300
+    updated_style = r.json()
+    assert updated_style["id"] == old_style.id
+    assert updated_style["base_link"]
+    assert updated_style["base_link"] == old_style.base_link
+    assert updated_style["name"] == data["name"]
+
+
+def test_style_update_wrong_id(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    style = create_random_style(db, random_user)
+    wrong_id = style.id + 100
+    data = {"name": random_lower_string(8), "base_link": random_lower_string(8)}
+    user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
+    r = client.put(f"/styles/{wrong_id}/", headers=user_token_headers, json=data)
+    assert r.status_code == 400
+    one_style = r.json()
+    assert one_style["detail"]["type"] == str(StylesErrors.UserHasNoAccess)
+
+
+def test_style_update_wrong_id_admin(
+    client: TestClient, db: Session, superuser_token_headers
+) -> None:
+    random_user = create_random_user(db)
+    style = create_random_style(db, random_user)
+    wrong_id = style.id + 100
+    data = {"name": random_lower_string(8), "base_link": random_lower_string(8)}
+    r = client.put(f"/styles/{wrong_id}/", headers=superuser_token_headers, json=data)
+    assert r.status_code == 400
+    one_style = r.json()
+    assert one_style["detail"]["type"] == str(StylesErrors.StyleDoesNotExist)
+
+
+def test_style_update_same_name(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    style = create_random_style(db, random_user)
+    style_same = create_random_style(db, random_user)
+    data = {"name": style_same.name, "base_link": random_lower_string(8)}
+    user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
+    r = client.put(f"/styles/{style.id}/", headers=user_token_headers, json=data)
+    assert r.status_code == 400
+    one_style = r.json()
+    assert one_style["detail"]["type"] == str(StylesErrors.StyleAlreadyExists)
+
+
+def test_style_update_wrong_user(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    another_user = create_random_user(db)
+    style = create_random_style(db, another_user)
+    data = {"name": random_lower_string(8), "base_link": random_lower_string(8)}
+    user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
+    r = client.put(f"/styles/{style.id}/", headers=user_token_headers, json=data)
+    assert r.status_code == 400
+    one_style = r.json()
+    assert one_style["detail"]["type"] == str(StylesErrors.UserHasNoAccess)

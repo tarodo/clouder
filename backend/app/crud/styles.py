@@ -3,9 +3,9 @@ from app.models import Style, StyleIn, StyleUpdate
 from sqlmodel import Session, SQLModel, select
 
 
-def read_by_name(db: Session, name: str) -> Style | None:
+def read_by_name(db: Session, user_id: int, name: str) -> Style | None:
     """Read one style by name"""
-    style = select(Style).where(Style.name == name)
+    style = select(Style).where(Style.user_id == user_id).where(Style.name == name)
     style = db.exec(style).first()
     return style
 

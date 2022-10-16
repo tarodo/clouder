@@ -1,13 +1,19 @@
+from sqlalchemy import UniqueConstraint
+
 from app.models.users import User
 from pydantic import constr
 from sqlmodel import Field, Relationship, SQLModel
 
+# TODO: Change vars to enums
+name_con = constr(min_length=1)
+link_con = constr(min_length=1)
+
 
 class StyleBase(SQLModel):
-    name: constr(min_length=1) = Field(
-        index=True, sa_column_kwargs={"unique": True}, nullable=False
+    name: name_con = Field(
+        index=True, nullable=False
     )
-    base_link: constr(min_length=1) = Field(...)
+    base_link: link_con = Field(...)
 
 
 class StyleBaseDB(StyleBase):
@@ -15,6 +21,7 @@ class StyleBaseDB(StyleBase):
 
 
 class Style(StyleBaseDB, table=True):
+    __table_args__ = (UniqueConstraint("user_id", "name"),)
     id: int = Field(primary_key=True)
     user: User = Relationship(back_populates="styles")
 
@@ -28,8 +35,8 @@ class StyleOut(StyleBaseDB):
 
 
 class StyleUpdate(SQLModel):
-    name: str | None = None
-    base_link: str | None = None
+    name: name_con | None = None
+    base_link: link_con | None = None
 
 
 class StyleInApi(StyleBase):

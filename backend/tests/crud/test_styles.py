@@ -27,7 +27,7 @@ def test_style_read_by_id(db: Session, random_user: User) -> None:
 
 def test_style_read_by_name(db: Session, random_user: User) -> None:
     style = create_random_style(db, random_user)
-    test_style = styles.read_by_name(db, style.name)
+    test_style = styles.read_by_name(db, random_user.id, style.name)
     assert test_style == style
 
 

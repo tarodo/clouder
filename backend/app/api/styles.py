@@ -3,7 +3,7 @@ from enum import Enum
 from app.api import deps
 from app.api.tools import raise_400
 from app.crud import styles
-from app.models import Style, StyleIn, StyleInApi, StyleOut, User, responses
+from app.models import Style, StyleIn, StyleInApi, StyleOut, User, responses, StyleUpdate
 from fastapi import APIRouter, Depends, Body
 from sqlmodel import Session
 
@@ -23,6 +23,11 @@ def check_to_read(user: User, one_style: Style) -> bool:
     if user is one_style.user:
         return True
     return False
+
+
+def check_to_update(user: User, one_style: Style) -> bool:
+    """Check if the user has update permission"""
+    return check_to_read(user, one_style)
 
 
 create_examples = {
@@ -60,7 +65,7 @@ def create_style(
     db: Session = Depends(deps.get_db),
 ) -> Style:
     """Create one style"""
-    old_style = styles.read_by_name(db, payload.name)
+    old_style = styles.read_by_name(db, current_user.id, payload.name)
     if old_style:
         raise_400(StylesErrors.StyleAlreadyExists)
     style_in = StyleIn(**payload.dict(), user_id=current_user.id)
@@ -95,3 +100,27 @@ def read_by_id(
         if current_user.is_admin:
             return raise_400(StylesErrors.StyleDoesNotExist)
     return raise_400(StylesErrors.UserHasNoAccess)
+
+
+@router.put(
+    "/{style_id}/", response_model=StyleOut, status_code=200, responses=responses
+)
+def update_by_id(
+    style_id: int,
+    payload: StyleUpdate,
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db),
+) -> Style | None:
+    """Update the style for the user"""
+    one_style = styles.read_by_id(db, style_id)
+    if not one_style:
+        if current_user.is_admin:
+            return raise_400(StylesErrors.StyleDoesNotExist)
+        return raise_400(StylesErrors.UserHasNoAccess)
+    if payload.name:
+        if styles.read_by_name(db, current_user.id, payload.name):
+            raise_400(StylesErrors.StyleAlreadyExists)
+    if not check_to_update(current_user, one_style):
+        return raise_400(StylesErrors.UserHasNoAccess)
+
+    return styles.update(db, one_style, payload)
