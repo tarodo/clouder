@@ -13,6 +13,7 @@ router = APIRouter()
 class StylesErrors(Enum):
     UserHasNoAccess = "User has no access"
     StyleDoesNotExist = "Style does not exist"
+    StyleAlreadyExists = "Style already exists"
 
 
 def check_to_read(user: User, one_style: Style) -> bool:
@@ -59,6 +60,9 @@ def create_style(
     db: Session = Depends(deps.get_db),
 ) -> Style:
     """Create one style"""
+    old_style = styles.read_by_name(db, payload.name)
+    if old_style:
+        raise_400(StylesErrors.StyleAlreadyExists)
     style_in = StyleIn(**payload.dict(), user_id=current_user.id)
     style = styles.create(db, style_in)
     return style

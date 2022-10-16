@@ -46,6 +46,18 @@ def test_style_create_empty_base_link(
     assert r.status_code == 422
 
 
+def test_style_create_same(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    data = {"name": random_lower_string(8), "base_link": random_lower_string(8)}
+    user_token_headers = get_authentication_token_from_email(client=client, email=random_user.email, db=db)
+    client.post(f"/styles/", headers=user_token_headers, json=data)
+    r = client.post(f"/styles/", headers=user_token_headers, json=data)
+    assert r.status_code == 400
+    one_style = r.json()
+    assert one_style["detail"]["type"] == str(StylesErrors.StyleAlreadyExists)
+
+
 def test_style_read_all_for_user(
     client: TestClient, db: Session, random_user: User
 ) -> None:
