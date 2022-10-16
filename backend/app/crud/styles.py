@@ -10,6 +10,13 @@ def read_by_name(db: Session, name: str) -> Style | None:
     return style
 
 
+def read_by_user_id(db: Session, user_id: int) -> list[Style] | None:
+    """Read styles of the user"""
+    user_styles = select(Style).where(Style.user_id == user_id)
+    user_styles = db.exec(user_styles).all()
+    return user_styles
+
+
 def read_by_id(db: Session, style_id: int) -> Style | None:
     return common.read_by_id(db, Style, style_id)
 

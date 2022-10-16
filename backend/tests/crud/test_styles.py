@@ -60,3 +60,15 @@ def test_style_remove(db, random_user) -> None:
     style = styles.remove(db, style)
     test_style = styles.read_by_id(db, style.id)
     assert not test_style
+
+
+def test_style_read_by_user_id(db: Session, random_user: User) -> None:
+    styles_ids = set([create_random_style(db, random_user).id for _ in range(3)])
+
+    user_styles = styles.read_by_user_id(db, random_user.id)
+    assert styles_ids == set([style.id for style in user_styles])
+
+
+def test_style_read_by_wrong_user_id(db: Session, random_user: User) -> None:
+    user_styles = styles.read_by_user_id(db, 666)
+    assert not user_styles
