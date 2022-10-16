@@ -1,4 +1,4 @@
-from pydantic import EmailStr
+from pydantic import EmailStr, constr
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -15,7 +15,7 @@ class User(UserBase, table=True):
 
 
 class UserIn(UserBase):
-    password: str = Field(...)
+    password: constr(min_length=6) = Field(...)
 
 
 class UserOut(UserBase):

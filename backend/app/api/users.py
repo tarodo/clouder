@@ -4,7 +4,7 @@ from app.api import deps
 from app.api.tools import raise_400
 from app.crud import users
 from app.models import User, UserIn, UserOut, responses
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from sqlmodel import Session
 
 router = APIRouter()
@@ -15,9 +15,31 @@ class UsersErrors(Enum):
     UserWithEmailExists = "User with Email exists"
 
 
+create_examples = {
+    "work": {
+        "summary": "A work example",
+        "description": "A **work** item works correctly.",
+        "value": {
+            "email": "user@test.com",
+            "password": "password",
+        },
+    },
+    "short_pass": {
+        "summary": "ERROR: short password",
+        "description": "The password is too short",
+        "value": {
+            "email": "user_short@test.com",
+            "password": "pass",
+        },
+    },
+}
+
+
 @router.post("/", response_model=UserOut, status_code=200, responses=responses)
 def create_user(
-    payload: UserIn,
+    payload: UserIn = Body(
+        examples=create_examples
+    ),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> User:
