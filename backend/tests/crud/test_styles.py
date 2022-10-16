@@ -1,14 +1,10 @@
+import random
+
 from app.crud import styles
 from app.models import Style, StyleIn, StyleUpdate, User
 from sqlmodel import Session
+from tests.utils.styles import create_random_style, create_random_styles
 from tests.utils.utils import random_lower_string
-
-
-def create_random_style(db: Session, user: User) -> Style:
-    style_in = StyleIn(
-        user_id=user.id, name=random_lower_string(8), base_link=random_lower_string(8)
-    )
-    return styles.create(db, payload=style_in)
 
 
 def test_style_create(db: Session, random_user: User) -> None:
@@ -63,7 +59,9 @@ def test_style_remove(db, random_user) -> None:
 
 
 def test_style_read_by_user_id(db: Session, random_user: User) -> None:
-    styles_ids = set([create_random_style(db, random_user).id for _ in range(3)])
+    styles_ids = set(
+        [one_style.id for one_style in create_random_styles(db, random_user)]
+    )
 
     user_styles = styles.read_by_user_id(db, random_user.id)
     assert styles_ids == set([style.id for style in user_styles])
