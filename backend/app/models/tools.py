@@ -2,8 +2,8 @@ from sqlmodel import Field, SQLModel
 
 
 class Message(SQLModel):
-    err: str = Field(..., description="Error code")
-    message: str = Field(..., description="Full error message")
+    type: str = Field(..., description="Error code")
+    msg: str = Field(..., description="Full error message")
 
 
 class ErrorMessage(SQLModel):
