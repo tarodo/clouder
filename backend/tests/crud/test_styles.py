@@ -68,5 +68,5 @@ def test_style_read_by_user_id(db: Session, random_user: User) -> None:
 
 
 def test_style_read_by_wrong_user_id(db: Session, random_user: User) -> None:
-    user_styles = styles.read_by_user_id(db, 666)
+    user_styles = styles.read_by_user_id(db, 66666)
     assert not user_styles
