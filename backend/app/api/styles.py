@@ -3,8 +3,9 @@ from enum import Enum
 from app.api import deps
 from app.api.tools import raise_400
 from app.crud import styles
-from app.models import Style, StyleIn, StyleInApi, StyleOut, User, responses, StyleUpdate
-from fastapi import APIRouter, Depends, Body
+from app.models import (Style, StyleIn, StyleInApi, StyleOut, StyleUpdate,
+                        User, responses)
+from fastapi import APIRouter, Body, Depends
 from sqlmodel import Session
 
 router = APIRouter()
@@ -52,15 +53,13 @@ create_examples = {
             "name": "base_link",
             "base_link": "",
         },
-    }
+    },
 }
 
 
 @router.post("/", response_model=StyleOut, status_code=200, responses=responses)
 def create_style(
-    payload: StyleInApi = Body(
-        examples=create_examples
-    ),
+    payload: StyleInApi = Body(examples=create_examples),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Style:

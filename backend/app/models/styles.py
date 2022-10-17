@@ -1,7 +1,6 @@
-from sqlalchemy import UniqueConstraint
-
 from app.models.users import User
 from pydantic import constr
+from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
 # TODO: Change vars to enums
@@ -10,9 +9,7 @@ link_con = constr(min_length=1)
 
 
 class StyleBase(SQLModel):
-    name: name_con = Field(
-        index=True, nullable=False
-    )
+    name: name_con = Field(index=True, nullable=False)
     base_link: link_con = Field(...)
 
 

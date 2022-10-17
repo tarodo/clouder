@@ -4,7 +4,7 @@ from app.api import deps
 from app.api.tools import raise_400
 from app.crud import users
 from app.models import User, UserIn, UserOut, responses
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Body, Depends
 from sqlmodel import Session
 
 router = APIRouter()
@@ -37,9 +37,7 @@ create_examples = {
 
 @router.post("/", response_model=UserOut, status_code=200, responses=responses)
 def create_user(
-    payload: UserIn = Body(
-        examples=create_examples
-    ),
+    payload: UserIn = Body(examples=create_examples),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> User:
