@@ -16,6 +16,10 @@ You need to create `.env` file in `./backend` directory:
 2. FIRST_SUPERUSER - str, admin email
 3. FIRST_SUPERUSER_PASSWORD - str, admin pass
 
+You need to create `.env` file in './db' directory:
+1. POSTGRES_USER - default user
+2. POSTGRES_PASSWORD - pass of the user
+
 ## Start
 ### Start in Docker-compose
 1. `docker-compose up`
