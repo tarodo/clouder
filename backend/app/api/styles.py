@@ -13,6 +13,7 @@ router = APIRouter()
 
 class StylesErrors(Enum):
     UserHasNoAccess = "User has no access"
+    UserHasNoRights = "User has no rights"
     StyleDoesNotExist = "Style does not exist"
     StyleAlreadyExists = "Style already exists"
 

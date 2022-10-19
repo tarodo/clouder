@@ -1,15 +1,16 @@
 from typing import Generator
 
 import pytest
-from sqlmodel import Session
-
 from app.core.config import settings
 from app.db import session
-from fastapi.testclient import TestClient
-
 from app.models import User
+from fastapi.testclient import TestClient
+from sqlmodel import Session
+from tests.utils.users import (create_random_user,
+                               get_authentication_token_from_email,
+                               get_superuser_token_headers)
+
 from main import app
-from tests.utils.users import get_authentication_token_from_email, get_superuser_token_headers, create_random_user
 
 
 @pytest.fixture(scope="session")
