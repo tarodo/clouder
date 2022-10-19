@@ -9,7 +9,7 @@ services:
     volumes:
       - ./backend/:/usr/src/app
     ports:
-      - 8007:8000
+      - 8006:8000
     environment:
       - ENVIRONMENT=dev
       - TESTING=0
