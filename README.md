@@ -15,3 +15,14 @@ You need to create `.env` file in `./backend` directory:
 1. DB_URL - str, string for DB connection
 2. FIRST_SUPERUSER - str, admin email
 3. FIRST_SUPERUSER_PASSWORD - str, admin pass
+
+## Start
+### Start in Docker-compose
+1. `docker-compose up`
+
+### Start test
+1. `docker-compose exec quiz-back python -m pytest --cov app`
+
+### Before commit
+1. `black .\beatport.py .\models.py .\spotify.py .\backend\app\api\ .\backend\app\core\ .\backend\app\crud\ .\backend\app\models\ .\backend\tests\`
+2. `isort .\beatport.py .\models.py .\spotify.py .\backend\app\api\ .\backend\app\core\ .\backend\app\crud\ .\backend\app\models\ .\backend\tests\`
