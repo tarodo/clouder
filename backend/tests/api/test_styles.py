@@ -302,6 +302,45 @@ def test_style_remove(client: TestClient, db: Session, random_user: User) -> Non
     assert not style_db
 
 
+def test_style_remove_admin(
+    client: TestClient, db: Session, superuser_token_headers
+) -> None:
+    random_user = create_random_user(db)
+    style = create_random_style(db, random_user)
+    r = client.delete(f"/styles/{style.id}/", headers=superuser_token_headers)
+    assert 200 <= r.status_code < 300
+    user_style = r.json()
+    assert style.id == user_style["id"]
+    style_db = styles.read_by_id(db, user_style["id"])
+    assert not style_db
+
+
+def test_style_remove_wrong_id(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    style = create_random_style(db, random_user)
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    wrong_id = style.id + 100
+    r = client.delete(f"/styles/{wrong_id}/", headers=user_token_headers)
+    assert r.status_code == 400
+    one_style = r.json()
+    assert one_style["detail"]["type"] == str(StylesErrors.UserHasNoAccess)
+
+
+def test_style_remove_wrong_id_admin(
+    client: TestClient, db: Session, superuser_token_headers
+) -> None:
+    random_user = create_random_user(db)
+    style = create_random_style(db, random_user)
+    wrong_id = style.id + 100
+    r = client.delete(f"/styles/{wrong_id}/", headers=superuser_token_headers)
+    assert r.status_code == 400
+    one_style = r.json()
+    assert one_style["detail"]["type"] == str(StylesErrors.StyleDoesNotExist)
+
+
 def test_style_remove_wrong_user(
     client: TestClient, db: Session, random_user: User
 ) -> None:

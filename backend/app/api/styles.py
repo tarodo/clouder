@@ -32,6 +32,11 @@ def check_to_update(user: User, one_style: Style) -> bool:
     return check_to_read(user, one_style)
 
 
+def check_to_remove(user: User, one_style: Style) -> bool:
+    """Check if the user has delete permission"""
+    return check_to_read(user, one_style)
+
+
 create_examples = {
     "work": {
         "summary": "A work example",
@@ -86,7 +91,7 @@ def read_my(
 @router.get(
     "/{style_id}/", response_model=StyleOut, status_code=200, responses=responses
 )
-def read_by_id(
+def read(
     style_id: int,
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
@@ -105,7 +110,7 @@ def read_by_id(
 @router.put(
     "/{style_id}/", response_model=StyleOut, status_code=200, responses=responses
 )
-def update_by_id(
+def update(
     style_id: int,
     payload: StyleUpdate,
     current_user: User = Depends(deps.get_current_user),
@@ -124,3 +129,23 @@ def update_by_id(
         return raise_400(StylesErrors.UserHasNoAccess)
 
     return styles.update(db, one_style, payload)
+
+
+@router.delete(
+    "/{style_id}/", response_model=StyleOut, status_code=200, responses=responses
+)
+def remove(
+    style_id: int,
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db),
+) -> Style | None:
+    """Remove the style by id"""
+    one_style = styles.read_by_id(db, style_id)
+    if not one_style:
+        if current_user.is_admin:
+            return raise_400(StylesErrors.StyleDoesNotExist)
+        return raise_400(StylesErrors.UserHasNoAccess)
+    if not check_to_remove(current_user, one_style):
+        return raise_400(StylesErrors.UserHasNoRights)
+
+    return styles.remove(db, one_style)
