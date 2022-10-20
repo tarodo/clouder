@@ -3,7 +3,7 @@ from enum import Enum
 from app.api import deps
 from app.api.tools import raise_400
 from app.crud import styles
-from app.models import (Style, StyleIn, StyleInApi, StyleOut, StyleUpdate,
+from app.models import (Style, StyleInDB, StyleInApi, StyleOut, StyleUpdate,
                         User, responses)
 from fastapi import APIRouter, Body, Depends
 from sqlmodel import Session
@@ -73,7 +73,7 @@ def create_style(
     old_style = styles.read_by_name(db, current_user.id, payload.name)
     if old_style:
         raise_400(StylesErrors.StyleAlreadyExists)
-    style_in = StyleIn(**payload.dict(), user_id=current_user.id)
+    style_in = StyleInDB(**payload.dict(), user_id=current_user.id)
     style = styles.create(db, style_in)
     return style
 

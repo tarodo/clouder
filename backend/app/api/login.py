@@ -7,7 +7,6 @@ from app.api.tools import raise_400
 from app.core import security
 from app.core.config import settings
 from app.crud import users
-from app.models import User, responses
 from app.models.token import Token
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm

@@ -12,6 +12,7 @@ class User(UserBase, table=True):
     password: str = Field(...)
 
     styles: "Style" = Relationship(back_populates="user")
+    periods: "Period" = Relationship(back_populates="user")
 
 
 class UserIn(UserBase):

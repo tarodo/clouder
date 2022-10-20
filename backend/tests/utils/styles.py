@@ -1,14 +1,14 @@
 import random
 
 from app.crud import styles
-from app.models import Style, StyleIn, User
+from app.models import Style, StyleInDB, User
 from sqlmodel import Session
 from tests.utils.utils import random_lower_string
 
 
 def create_random_style(db: Session, user: User) -> Style:
     """Create random style for the user"""
-    style_in = StyleIn(
+    style_in = StyleInDB(
         user_id=user.id, name=random_lower_string(8), base_link=random_lower_string(8)
     )
     return styles.create(db, payload=style_in)

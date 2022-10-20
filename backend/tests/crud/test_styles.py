@@ -1,14 +1,14 @@
 import random
 
 from app.crud import styles
-from app.models import Style, StyleIn, StyleUpdate, User
+from app.models import Style, StyleInDB, StyleUpdate, User
 from sqlmodel import Session
 from tests.utils.styles import create_random_style, create_random_styles
 from tests.utils.utils import random_lower_string
 
 
 def test_style_create(db: Session, random_user: User) -> None:
-    style_in = StyleIn(
+    style_in = StyleInDB(
         user_id=random_user.id,
         name=random_lower_string(8),
         base_link=random_lower_string(8),

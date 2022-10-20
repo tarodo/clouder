@@ -23,7 +23,7 @@ class Style(StyleBaseDB, table=True):
     user: User = Relationship(back_populates="styles")
 
 
-class StyleIn(StyleBaseDB):
+class StyleInDB(StyleBaseDB):
     pass
 
 

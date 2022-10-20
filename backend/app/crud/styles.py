@@ -1,6 +1,6 @@
 from app.crud import common
-from app.models import Style, StyleIn, StyleUpdate
-from sqlmodel import Session, SQLModel, select
+from app.models import Style, StyleInDB, StyleUpdate
+from sqlmodel import Session, select
 
 
 def read_by_name(db: Session, user_id: int, name: str) -> Style | None:
@@ -21,7 +21,7 @@ def read_by_id(db: Session, style_id: int) -> Style | None:
     return common.read_by_id(db, Style, style_id)
 
 
-def create(db: Session, payload: StyleIn) -> Style:
+def create(db: Session, payload: StyleInDB) -> Style:
     return common.create(db, Style, payload)
 
 

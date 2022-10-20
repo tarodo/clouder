@@ -1,5 +1,3 @@
-import copy
-
 from fastapi.encoders import jsonable_encoder
 from sqlmodel import Session, SQLModel, select
 
