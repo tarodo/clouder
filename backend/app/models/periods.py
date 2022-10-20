@@ -1,9 +1,9 @@
 import datetime
 
+from app.models.users import User
 from pydantic import EmailStr, constr
 from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
-from app.models.users import User
 
 name_con = constr(min_length=1)
 

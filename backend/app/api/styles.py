@@ -3,7 +3,7 @@ from enum import Enum
 from app.api import deps
 from app.api.tools import raise_400
 from app.crud import styles
-from app.models import (Style, StyleInDB, StyleInApi, StyleOut, StyleUpdate,
+from app.models import (Style, StyleInApi, StyleInDB, StyleOut, StyleUpdate,
                         User, responses)
 from fastapi import APIRouter, Body, Depends
 from sqlmodel import Session
