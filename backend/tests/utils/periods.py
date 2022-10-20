@@ -2,18 +2,27 @@ import datetime
 import random
 
 from app.crud import periods
-from app.models import Period, PeriodInDB, User
+from app.models import Period, PeriodInApi, PeriodInDB, User
 from sqlmodel import Session
 from tests.utils.utils import random_lower_string
+
+
+def get_valid_period_in() -> PeriodInApi:
+    """Return valid dict of PeriodInApi"""
+    period_in = PeriodInApi(
+        name=random_lower_string(8),
+        first_day=datetime.date.today(),
+        last_day=datetime.date.today() + datetime.timedelta(days=7),
+    )
+
+    return period_in
 
 
 def create_random_period(db: Session, user: User) -> Period:
     """Create random period for the user"""
     period_in = PeriodInDB(
         user_id=user.id,
-        name=random_lower_string(8),
-        first_day=datetime.date.today(),
-        last_day=datetime.date.today() + datetime.timedelta(days=7),
+        **get_valid_period_in().dict()
     )
     return periods.create(db, payload=period_in)
 
@@ -28,3 +37,6 @@ def create_random_periods(
         else:
             return None
     return [create_random_period(db, user) for _ in range(cnt)]
+
+
+
