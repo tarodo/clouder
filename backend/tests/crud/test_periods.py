@@ -101,3 +101,10 @@ def test_period_update_last_day(db, random_user) -> None:
     assert period_updated.name == old_version["name"]
     assert period_updated.first_day == old_version["first_day"]
     assert period_updated.last_day != old_version["last_day"]
+
+
+def test_period_remove(db, random_user) -> None:
+    period = create_random_period(db, random_user)
+    period = periods.remove(db, period)
+    test_period = periods.read_by_id(db, period.id)
+    assert not test_period
