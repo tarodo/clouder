@@ -2,7 +2,7 @@ import datetime
 import random
 
 from app.crud import periods
-from app.models import PeriodInDB, User, Period
+from app.models import Period, PeriodInDB, User
 from sqlmodel import Session
 from tests.utils.utils import random_lower_string
 

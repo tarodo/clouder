@@ -13,10 +13,10 @@ class PeriodBase(SQLModel):
     first_day: datetime.date = Field(...)
     last_day: datetime.date = Field(...)
 
-    @validator('last_day')
+    @validator("last_day")
     def last_not_early_first(cls, v, values, **kwargs):
         if v < values["first_day"]:
-            raise ValueError('The last day should not be earlier than the first day')
+            raise ValueError("The last day should not be earlier than the first day")
         return v
 
 

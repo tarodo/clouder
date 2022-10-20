@@ -1,9 +1,8 @@
 import datetime
 
 from app.crud import periods
-from app.models import PeriodInDB, User, PeriodUpdate
+from app.models import PeriodInDB, PeriodUpdate, User
 from sqlmodel import Session
-
 from tests.utils.periods import create_random_period, create_random_periods
 from tests.utils.utils import random_lower_string
 
@@ -49,7 +48,7 @@ def test_period_update_full(db, random_user) -> None:
     period_update_in = PeriodUpdate(
         name=random_lower_string(8),
         first_day=period.first_day - datetime.timedelta(days=1),
-        last_day=period.last_day + datetime.timedelta(days=1)
+        last_day=period.last_day + datetime.timedelta(days=1),
     )
     period_updated = periods.update(db, period, period_update_in)
     assert period_updated == period
