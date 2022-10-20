@@ -1,7 +1,5 @@
-import random
-
 from app.crud import styles
-from app.models import Style, StyleInDB, StyleUpdate, User
+from app.models import StyleInDB, StyleUpdate, User
 from sqlmodel import Session
 from tests.utils.styles import create_random_style, create_random_styles
 from tests.utils.utils import random_lower_string

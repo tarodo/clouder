@@ -20,7 +20,7 @@ def create_random_styles(
     """Create list of styles for the user"""
     if not cnt:
         if min_cnt and max_cnt:
-            cnt = random.randint(2, 4)
+            cnt = random.randint(min_cnt, max_cnt)
         else:
             return None
     return [create_random_style(db, user) for _ in range(cnt)]
