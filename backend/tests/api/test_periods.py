@@ -146,3 +146,67 @@ def test_period_read_many_for_user(
     assert 200 <= r.status_code < 300
     user_periods = r.json()
     assert set([one_period["id"] for one_period in user_periods]) == periods_ids
+
+
+def test_period_read_by_id(client: TestClient, db: Session, random_user: User) -> None:
+    period = create_random_period(db, random_user)
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.get(f"/periods/{period.id}/", headers=user_token_headers)
+    assert 200 <= r.status_code < 300
+    user_period = r.json()
+    period_db = periods.read_by_id(db, user_period["id"])
+    assert period == period_db
+
+
+def test_period_read_by_id_wrong_user(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    another_user = create_random_user(db)
+    period = create_random_period(db, another_user)
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.get(f"/periods/{period.id}/", headers=user_token_headers)
+    assert r.status_code == 400
+    one_period = r.json()
+    assert one_period["detail"]["type"] == str(PeriodsErrors.UserHasNoAccess)
+
+
+def test_period_read_by_id_admin(
+    client: TestClient, db: Session, superuser_token_headers
+) -> None:
+    random_user = create_random_user(db)
+    period = create_random_period(db, random_user)
+    r = client.get(f"/periods/{period.id}/", headers=superuser_token_headers)
+    assert 200 <= r.status_code < 300
+    user_period = r.json()
+    period_db = periods.read_by_id(db, user_period["id"])
+    assert period == period_db
+
+
+def test_period_read_by_id_wrong_id(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    period = create_random_period(db, random_user)
+    wrong_id = period.id + 100
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.get(f"/periods/{wrong_id}/", headers=user_token_headers)
+    assert r.status_code == 400
+    one_period = r.json()
+    assert one_period["detail"]["type"] == str(PeriodsErrors.UserHasNoAccess)
+
+
+def test_period_read_by_id_wrong_id_admin(
+    client: TestClient, db: Session, superuser_token_headers
+) -> None:
+    random_user = create_random_user(db)
+    period = create_random_period(db, random_user)
+    wrong_id = period.id + 100
+    r = client.get(f"/periods/{wrong_id}/", headers=superuser_token_headers)
+    assert r.status_code == 400
+    one_period = r.json()
+    assert one_period["detail"]["type"] == str(PeriodsErrors.PeriodDoesNotExist)

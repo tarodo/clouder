@@ -13,6 +13,8 @@ router = APIRouter()
 
 class PeriodsErrors(Enum):
     PeriodAlreadyExists = "Period already exists"
+    UserHasNoAccess = "User has no access"
+    PeriodDoesNotExist = "Style does not exist"
 
 
 def check_to_read(user: User, one_period: Period) -> bool:
