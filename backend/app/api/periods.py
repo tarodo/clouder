@@ -54,7 +54,8 @@ def read_my(
     db: Session = Depends(deps.get_db),
 ) -> list[Period] | None:
     """Retrieve all periods for the user"""
-    pass
+    user_periods = periods.read_by_user_id(db, current_user.id)
+    return user_periods
 
 
 @router.get(
