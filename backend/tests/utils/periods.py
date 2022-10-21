@@ -7,12 +7,19 @@ from sqlmodel import Session
 from tests.utils.utils import random_lower_string
 
 
+def get_valid_period_dict() -> dict:
+    """Return valid dict of period"""
+    return {
+        "name": random_lower_string(8),
+        "first_day": str(datetime.date.today()),
+        "last_day": str(datetime.date.today() + datetime.timedelta(days=7)),
+    }
+
+
 def get_valid_period_in() -> PeriodInApi:
-    """Return valid dict of PeriodInApi"""
+    """Return valid PeriodInApi"""
     period_in = PeriodInApi(
-        name=random_lower_string(8),
-        first_day=datetime.date.today(),
-        last_day=datetime.date.today() + datetime.timedelta(days=7),
+        **get_valid_period_dict()
     )
 
     return period_in

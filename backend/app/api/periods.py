@@ -40,7 +40,12 @@ def create_period(
     db: Session = Depends(deps.get_db),
 ) -> Period:
     """Create one period"""
-    pass
+    old_period = periods.read_by_name(db, current_user.id, payload.name)
+    if old_period:
+        raise_400(PeriodsErrors.PeriodAlreadyExists)
+    period_in = PeriodInDB(**payload.dict(), user_id=current_user.id)
+    period = periods.create(db, period_in)
+    return period
 
 
 @router.get("/", response_model=list[PeriodOut], status_code=200, responses=responses)
