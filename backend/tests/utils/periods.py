@@ -18,19 +18,12 @@ def get_valid_period_dict() -> dict:
 
 def get_valid_period_in() -> PeriodInApi:
     """Return valid PeriodInApi"""
-    period_in = PeriodInApi(
-        **get_valid_period_dict()
-    )
-
-    return period_in
+    return PeriodInApi(**get_valid_period_dict())
 
 
 def create_random_period(db: Session, user: User) -> Period:
     """Create random period for the user"""
-    period_in = PeriodInDB(
-        user_id=user.id,
-        **get_valid_period_in().dict()
-    )
+    period_in = PeriodInDB(user_id=user.id, **get_valid_period_in().dict())
     return periods.create(db, payload=period_in)
 
 
@@ -44,6 +37,3 @@ def create_random_periods(
         else:
             return None
     return [create_random_period(db, user) for _ in range(cnt)]
-
-
-
