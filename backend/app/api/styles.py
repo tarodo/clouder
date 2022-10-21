@@ -96,7 +96,7 @@ def read(
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Style | None:
-    """Retrieve a style for the user"""
+    """Retrieve a style by id"""
     one_style = styles.read_by_id(db, style_id)
     if one_style:
         if check_to_read(current_user, one_style):

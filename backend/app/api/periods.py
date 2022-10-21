@@ -14,12 +14,16 @@ router = APIRouter()
 class PeriodsErrors(Enum):
     PeriodAlreadyExists = "Period already exists"
     UserHasNoAccess = "User has no access"
-    PeriodDoesNotExist = "Style does not exist"
+    PeriodDoesNotExist = "Period does not exist"
 
 
 def check_to_read(user: User, one_period: Period) -> bool:
     """Check if the user has read permission"""
-    pass
+    if user.is_admin:
+        return True
+    if user is one_period.user:
+        return True
+    return False
 
 
 def check_to_update(user: User, one_period: Period) -> bool:
@@ -68,8 +72,15 @@ def read(
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Period | None:
-    """Retrieve a period for the user"""
-    pass
+    """Retrieve a period by id"""
+    one_period = periods.read_by_id(db, period_id)
+    if one_period:
+        if check_to_read(current_user, one_period):
+            return one_period
+    else:
+        if current_user.is_admin:
+            return raise_400(PeriodsErrors.PeriodDoesNotExist)
+    return raise_400(PeriodsErrors.UserHasNoAccess)
 
 
 @router.put(
