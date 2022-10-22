@@ -275,7 +275,7 @@ def test_period_update_none_name(
     updated_period = r.json()
     assert updated_period["id"] == old_period.id
     assert updated_period["user_id"] == random_user.id
-    assert updated_period["name"] == data["name"]
+    assert updated_period["name"] == old_period.name
     assert updated_period["first_day"] == data["first_day"]
     assert updated_period["last_day"] == data["last_day"]
 
@@ -298,7 +298,9 @@ def test_period_update_first_gt_last_first_only(
 ) -> None:
     old_period = create_random_period(db, random_user)
     data = get_valid_period_dict()
-    data["first_day"] = data["last_day"] + datetime.timedelta(days=1)
+    data["first_day"] = (old_period.last_day + datetime.timedelta(days=1)).strftime(
+        "%Y-%m-%d"
+    )
     del data["last_day"]
     user_token_headers = get_authentication_token_from_email(
         client=client, email=random_user.email, db=db
@@ -312,7 +314,9 @@ def test_period_update_first_only(
 ) -> None:
     old_period = create_random_period(db, random_user)
     data = get_valid_period_dict()
-    data["first_day"] = old_period.last_day - datetime.timedelta(days=1)
+    data["first_day"] = (old_period.last_day - datetime.timedelta(days=1)).strftime(
+        "%Y-%m-%d"
+    )
     del data["last_day"]
     del data["name"]
     user_token_headers = get_authentication_token_from_email(
@@ -325,7 +329,7 @@ def test_period_update_first_only(
     assert updated_period["user_id"] == random_user.id
     assert updated_period["name"] == old_period.name
     assert updated_period["first_day"] == data["first_day"]
-    assert updated_period["last_day"] == old_period.last_day
+    assert updated_period["last_day"] == old_period.last_day.strftime("%Y-%m-%d")
 
 
 def test_period_update_wrong_id(
@@ -362,7 +366,7 @@ def test_period_update_same_name(
     period = create_random_period(db, random_user)
     period_same = create_random_period(db, random_user)
     data = get_valid_period_dict()
-    data["name"] = period_same
+    data["name"] = period_same.name
     user_token_headers = get_authentication_token_from_email(
         client=client, email=random_user.email, db=db
     )

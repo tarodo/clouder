@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 
 from app.api import deps
@@ -6,6 +7,7 @@ from app.crud import periods
 from app.models import (Period, PeriodInApi, PeriodInDB, PeriodOut,
                         PeriodUpdate, User, responses)
 from fastapi import APIRouter, Body, Depends
+from pydantic import ValidationError
 from sqlmodel import Session
 
 router = APIRouter()
@@ -15,6 +17,7 @@ class PeriodsErrors(Enum):
     PeriodAlreadyExists = "Period already exists"
     UserHasNoAccess = "User has no access"
     PeriodDoesNotExist = "Period does not exist"
+    FirstDayMustBeEarlier = "The last day should not be earlier than the first day"
 
 
 def check_to_read(user: User, one_period: Period) -> bool:
@@ -28,7 +31,7 @@ def check_to_read(user: User, one_period: Period) -> bool:
 
 def check_to_update(user: User, one_period: Period) -> bool:
     """Check if the user has update permission"""
-    pass
+    return check_to_read(user, one_period)
 
 
 def check_to_remove(user: User, one_period: Period) -> bool:
@@ -93,7 +96,35 @@ def update(
     db: Session = Depends(deps.get_db),
 ) -> Period | None:
     """Update the period for the user"""
-    pass
+    one_period = periods.read_by_id(db, period_id)
+    if not one_period:
+        if current_user.is_admin:
+            return raise_400(PeriodsErrors.PeriodDoesNotExist)
+        return raise_400(PeriodsErrors.UserHasNoAccess)
+
+    if not check_to_update(current_user, one_period):
+        return raise_400(PeriodsErrors.UserHasNoAccess)
+
+    if payload.name:
+        if periods.read_by_name(db, current_user.id, payload.name):
+            raise_400(PeriodsErrors.PeriodAlreadyExists)
+
+    first_day, last_day = payload.first_day, payload.last_day
+    if first_day or last_day:
+        if not first_day:
+            first_day = one_period.first_day
+        if not last_day:
+            last_day = one_period.last_day
+        payload.first_day = first_day
+        payload.last_day = last_day
+    try:
+        new_payload = PeriodUpdate(
+            name=payload.name, first_day=first_day, last_day=last_day
+        )
+    except ValidationError as e:
+        return raise_400(PeriodsErrors.FirstDayMustBeEarlier)
+
+    return periods.update(db, one_period, new_payload)
 
 
 @router.delete(
