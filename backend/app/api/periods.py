@@ -14,9 +14,10 @@ router = APIRouter()
 
 
 class PeriodsErrors(Enum):
-    PeriodAlreadyExists = "Period already exists"
     UserHasNoAccess = "User has no access"
+    UserHasNoRights = "User has no rights"
     PeriodDoesNotExist = "Period does not exist"
+    PeriodAlreadyExists = "Period already exists"
     FirstDayMustBeEarlier = "The last day should not be earlier than the first day"
 
 
