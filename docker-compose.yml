@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  quiz-back:
+  back:
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -16,9 +16,9 @@ services:
     env_file:
       - ./backend/.env
     depends_on:
-      - quiz-db
+      - db
 
-  quiz-db:
+  db:
     build:
       context: ./db
       dockerfile: Dockerfile
