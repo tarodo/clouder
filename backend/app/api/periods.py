@@ -1,4 +1,3 @@
-import logging
 from enum import Enum
 
 from app.api import deps
@@ -37,7 +36,7 @@ def check_to_update(user: User, one_period: Period) -> bool:
 
 def check_to_remove(user: User, one_period: Period) -> bool:
     """Check if the user has delete permission"""
-    pass
+    return check_to_read(user, one_period)
 
 
 create_examples = {}
@@ -118,6 +117,7 @@ def update(
             last_day = one_period.last_day
         payload.first_day = first_day
         payload.last_day = last_day
+
     try:
         new_payload = PeriodUpdate(
             name=payload.name, first_day=first_day, last_day=last_day
@@ -137,4 +137,12 @@ def remove(
     db: Session = Depends(deps.get_db),
 ) -> Period | None:
     """Remove the period by id"""
-    pass
+    one_period = periods.read_by_id(db, period_id)
+    if not one_period:
+        if current_user.is_admin:
+            return raise_400(PeriodsErrors.PeriodDoesNotExist)
+        return raise_400(PeriodsErrors.UserHasNoAccess)
+    if not check_to_remove(current_user, one_period):
+        return raise_400(PeriodsErrors.UserHasNoRights)
+
+    return periods.remove(db, one_period)
