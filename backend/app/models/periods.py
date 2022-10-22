@@ -1,7 +1,7 @@
 import datetime
 
 from app.models.users import User
-from pydantic import constr, validator
+from pydantic import constr, root_validator
 from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -13,11 +13,15 @@ class PeriodBase(SQLModel):
     first_day: datetime.date = Field(...)
     last_day: datetime.date = Field(...)
 
-    @validator("last_day")
-    def last_not_early_first(cls, v, values, **kwargs):
-        if v < values["first_day"]:
-            raise ValueError("The last day should not be earlier than the first day")
-        return v
+    @root_validator
+    def last_not_early_first(cls, values):
+        first_day, last_day = values.get("first_day"), values.get("last_day")
+        if first_day and last_day:
+            if first_day > last_day:
+                raise ValueError(
+                    "The last day should not be earlier than the first day"
+                )
+        return values
 
 
 class PeriodBaseDB(PeriodBase):
@@ -38,7 +42,7 @@ class PeriodOut(PeriodBaseDB):
     id: int = Field(...)
 
 
-class PeriodUpdate(SQLModel):
+class PeriodUpdate(PeriodBase):
     name: name_con | None = None
     first_day: datetime.date | None = None
     last_day: datetime.date | None = None

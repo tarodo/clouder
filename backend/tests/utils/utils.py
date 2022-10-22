@@ -13,6 +13,7 @@ def random_email() -> str:
 
 
 def random_date(start_date: int = 1, end_date: int = None) -> datetime:
+    # TODO: Change inputs to datetime
     if not end_date:
         end_date = int(time.time())
     new_date = random.randint(start_date, end_date)

@@ -210,3 +210,178 @@ def test_period_read_by_id_wrong_id_admin(
     assert r.status_code == 400
     one_period = r.json()
     assert one_period["detail"]["type"] == str(PeriodsErrors.PeriodDoesNotExist)
+
+
+def test_period_update(client: TestClient, db: Session, random_user: User) -> None:
+    old_period = create_random_period(db, random_user)
+    data = get_valid_period_dict()
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.put(f"/periods/{old_period.id}/", headers=user_token_headers, json=data)
+    assert 200 <= r.status_code < 300
+    updated_period = r.json()
+    assert updated_period["id"] == old_period.id
+    assert updated_period["user_id"] == random_user.id
+    assert updated_period["name"] == data["name"]
+    assert updated_period["name"] != old_period.name
+    assert updated_period["first_day"] == data["first_day"]
+    assert updated_period["last_day"] == data["last_day"]
+
+
+def test_period_update_admin(
+    client: TestClient, db: Session, superuser_token_headers
+) -> None:
+    random_user = create_random_user(db)
+    old_period = create_random_period(db, random_user)
+    data = get_valid_period_dict()
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.put(f"/periods/{old_period.id}/", headers=user_token_headers, json=data)
+    assert 200 <= r.status_code < 300
+    updated_period = r.json()
+    assert updated_period["id"] == old_period.id
+    assert updated_period["user_id"] == random_user.id
+    assert updated_period["name"] == data["name"]
+    assert updated_period["first_day"] == data["first_day"]
+    assert updated_period["last_day"] == data["last_day"]
+
+
+def test_period_update_empty_name(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    old_period = create_random_period(db, random_user)
+    data = get_valid_period_dict()
+    data["name"] = ""
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.put(f"/periods/{old_period.id}/", headers=user_token_headers, json=data)
+    assert r.status_code == 422
+
+
+def test_period_update_none_name(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    old_period = create_random_period(db, random_user)
+    data = get_valid_period_dict()
+    del data["name"]
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.put(f"/periods/{old_period.id}/", headers=user_token_headers, json=data)
+    assert 200 <= r.status_code < 300
+    updated_period = r.json()
+    assert updated_period["id"] == old_period.id
+    assert updated_period["user_id"] == random_user.id
+    assert updated_period["name"] == data["name"]
+    assert updated_period["first_day"] == data["first_day"]
+    assert updated_period["last_day"] == data["last_day"]
+
+
+def test_period_update_first_gt_last(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    old_period = create_random_period(db, random_user)
+    data = get_valid_period_dict()
+    data["first_day"], data["last_day"] = data["last_day"], data["first_day"]
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.put(f"/periods/{old_period.id}/", headers=user_token_headers, json=data)
+    assert r.status_code == 422
+
+
+def test_period_update_first_gt_last_first_only(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    old_period = create_random_period(db, random_user)
+    data = get_valid_period_dict()
+    data["first_day"] = data["last_day"] + datetime.timedelta(days=1)
+    del data["last_day"]
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.put(f"/periods/{old_period.id}/", headers=user_token_headers, json=data)
+    assert r.status_code == 400
+
+
+def test_period_update_first_only(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    old_period = create_random_period(db, random_user)
+    data = get_valid_period_dict()
+    data["first_day"] = old_period.last_day - datetime.timedelta(days=1)
+    del data["last_day"]
+    del data["name"]
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.put(f"/periods/{old_period.id}/", headers=user_token_headers, json=data)
+    assert 200 <= r.status_code < 300
+    updated_period = r.json()
+    assert updated_period["id"] == old_period.id
+    assert updated_period["user_id"] == random_user.id
+    assert updated_period["name"] == old_period.name
+    assert updated_period["first_day"] == data["first_day"]
+    assert updated_period["last_day"] == old_period.last_day
+
+
+def test_period_update_wrong_id(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    period = create_random_period(db, random_user)
+    wrong_id = period.id + 100
+    data = get_valid_period_dict()
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.put(f"/periods/{wrong_id}/", headers=user_token_headers, json=data)
+    assert r.status_code == 400
+    one_period = r.json()
+    assert one_period["detail"]["type"] == str(PeriodsErrors.UserHasNoAccess)
+
+
+def test_period_update_wrong_id_admin(
+    client: TestClient, db: Session, superuser_token_headers
+) -> None:
+    random_user = create_random_user(db)
+    period = create_random_period(db, random_user)
+    wrong_id = period.id + 100
+    data = get_valid_period_dict()
+    r = client.put(f"/periods/{wrong_id}/", headers=superuser_token_headers, json=data)
+    assert r.status_code == 400
+    one_period = r.json()
+    assert one_period["detail"]["type"] == str(PeriodsErrors.PeriodDoesNotExist)
+
+
+def test_period_update_same_name(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    period = create_random_period(db, random_user)
+    period_same = create_random_period(db, random_user)
+    data = get_valid_period_dict()
+    data["name"] = period_same
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.put(f"/periods/{period.id}/", headers=user_token_headers, json=data)
+    assert r.status_code == 400
+    one_period = r.json()
+    assert one_period["detail"]["type"] == str(PeriodsErrors.PeriodAlreadyExists)
+
+
+def test_period_update_wrong_user(
+    client: TestClient, db: Session, random_user: User
+) -> None:
+    another_user = create_random_user(db)
+    period = create_random_period(db, another_user)
+    data = get_valid_period_dict()
+    user_token_headers = get_authentication_token_from_email(
+        client=client, email=random_user.email, db=db
+    )
+    r = client.put(f"/periods/{period.id}/", headers=user_token_headers, json=data)
+    assert r.status_code == 400
+    one_period = r.json()
+    assert one_period["detail"]["type"] == str(PeriodsErrors.UserHasNoAccess)

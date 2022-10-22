@@ -20,7 +20,7 @@ def get_valid_period_dict() -> dict:
 
 
 def get_valid_period_in() -> PeriodInApi:
-    """Return valid PeriodInApi"""
+    """Return valid random PeriodInApi"""
     return PeriodInApi(**get_valid_period_dict())
 
 
@@ -33,7 +33,7 @@ def create_random_period(db: Session, user: User) -> Period:
 def create_random_periods(
     db: Session, user: User, cnt: int = None, min_cnt: int = 2, max_cnt: int = 10
 ) -> list[Period] | None:
-    """Create list of periodЫ for the user"""
+    """Create list of periods for the user"""
     if not cnt:
         if min_cnt and max_cnt:
             cnt = random.randint(min_cnt, max_cnt)
