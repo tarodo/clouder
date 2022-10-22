@@ -4,15 +4,18 @@ import random
 from app.crud import periods
 from app.models import Period, PeriodInApi, PeriodInDB, User
 from sqlmodel import Session
-from tests.utils.utils import random_lower_string
+from tests.utils.utils import random_date, random_lower_string
 
 
 def get_valid_period_dict() -> dict:
-    """Return valid dict of period"""
+    """Return valid dict of random period"""
+    first_day = random_date()
+    period = random.randint(1, 14)
+    last_day = first_day + datetime.timedelta(days=period)
     return {
         "name": random_lower_string(8),
-        "first_day": str(datetime.date.today()),
-        "last_day": str(datetime.date.today() + datetime.timedelta(days=7)),
+        "first_day": first_day.strftime("%Y-%m-%d"),
+        "last_day": last_day.strftime("%Y-%m-%d"),
     }
 
 
