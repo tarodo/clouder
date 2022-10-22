@@ -8,7 +8,7 @@ from app.api import login, users, styles, periods
 def create_application() -> FastAPI:
     application = FastAPI(
         title="cLoudER Space",
-        version="0.3.1"
+        version="0.3.2"
     )
     application.include_router(users.router, prefix="/users", tags=["users"])
     application.include_router(styles.router, prefix="/styles", tags=["styles"])

@@ -39,7 +39,49 @@ def check_to_remove(user: User, one_period: Period) -> bool:
     return check_to_read(user, one_period)
 
 
-create_examples = {}
+create_examples = {
+    "work": {
+        "summary": "A work example",
+        "description": "A **work** item works correctly.",
+        "value": {
+            "name": "Week 48",
+            "first_day": "2022-11-28",
+            "last_day": "2022-12-04",
+        },
+    },
+    "empty_name": {
+        "summary": "ERROR: empty name",
+        "value": {
+            "name": "",
+            "first_day": "2022-11-28",
+            "last_day": "2022-12-04",
+        },
+    },
+    "empty_first_day": {
+        "summary": "ERROR: empty first_day",
+        "value": {
+            "name": "Week 33",
+            "first_day": "",
+            "last_day": "2022-12-04",
+        },
+    },
+    "empty_last_day": {
+        "summary": "ERROR: empty last_day",
+        "value": {
+            "name": "Week 13",
+            "first_day": "2022-11-28",
+            "last_day": "",
+        },
+    },
+    "last_day_earlier": {
+        "summary": "ERROR: last day earlier than first day",
+        "value": {
+            "name": "Week 13",
+            "first_day": "2022-06-22",
+            "last_day": "2022-04-10",
+        },
+    },
+}
 
 
 @router.post("/", response_model=PeriodOut, status_code=200, responses=responses)
