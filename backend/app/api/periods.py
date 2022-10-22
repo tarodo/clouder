@@ -83,6 +83,31 @@ create_examples = {
     },
 }
 
+update_example = {
+    "full_work": {
+        "summary": "A work example for update",
+        "value": {
+            "name": "Week 1",
+            "first_day": "2022-01-01",
+            "last_day": "2022-01-02",
+        },
+    },
+    "one_element_work": {
+        "summary": "A work example for update one field",
+        "value": {
+            "name": "Week 100.2",
+        },
+    },
+    "last_day_earlier": {
+        "summary": "ERROR: last day earlier than first day",
+        "value": {
+            "name": "Week 33",
+            "first_day": "2022-06-22",
+            "last_day": "2022-01-01",
+        },
+    },
+}
+
 
 @router.post("/", response_model=PeriodOut, status_code=200, responses=responses)
 def create_period(
@@ -133,7 +158,7 @@ def read(
 )
 def update(
     period_id: int,
-    payload: PeriodUpdate,
+    payload: PeriodUpdate = Body(examples=update_example),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Period | None:
