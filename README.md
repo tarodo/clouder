@@ -25,7 +25,7 @@ You need to create `.env` file in './db' directory:
 1. `docker-compose up`
 
 ### Start test
-1. `docker-compose exec quiz-back python -m pytest --cov app`
+1. `docker-compose exec back python -m pytest --cov app`
 
 ### Before commit
 1. `black .\beatport.py .\models.py .\spotify.py .\backend\app\api\ .\backend\app\core\ .\backend\app\crud\ .\backend\app\models\ .\backend\tests\`
