@@ -33,7 +33,6 @@ def create_random_packs(
     styles = create_random_styles(db, user, min_cnt=1, max_cnt=max(1, cnt // 2))
     styles_cnt = len(styles)
     periods_cnt = math.ceil(cnt / styles_cnt)
-    logging.error(f"{cnt=} :: {styles_cnt=} :: {periods_cnt=}")
     periods = create_random_periods(db, user, cnt=periods_cnt)
     random_packs = []
     for style in styles:
@@ -44,6 +43,5 @@ def create_random_packs(
                 sheets_count=random.randint(1, 10),
             )
             new_pack = packs.create(db, payload=pack)
-            logging.error(f"{new_pack=}")
             random_packs.append(new_pack)
     return random_packs[:cnt]

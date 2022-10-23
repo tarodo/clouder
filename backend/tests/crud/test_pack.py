@@ -1,4 +1,5 @@
 import datetime
+import logging
 import random
 
 from app.crud import packs
@@ -21,3 +22,25 @@ def test_pack_create(db: Session, random_user: User) -> None:
     assert pack.style_id == pack_in.style_id
     assert pack.period_id == pack_in.period_id
     assert pack.sheets_count == pack_in.sheets_count
+
+
+def test_pack_read(db: Session, random_user: User) -> None:
+    pack = create_random_pack(db, random_user)
+    test_packs = packs.read_packs(db, pack.style_id, pack.period_id)
+    assert test_packs[0] == pack
+
+
+def test_pack_read_by_style(db: Session, random_user: User) -> None:
+    user_packs = create_random_packs(db, random_user, 8)
+    control_style = user_packs[0].style_id
+    test_packs = packs.read_packs(db, style_id=control_style)
+    assert test_packs
+    assert all(pack in user_packs for pack in test_packs)
+
+
+def test_pack_read_by_period(db: Session, random_user: User) -> None:
+    user_packs = create_random_packs(db, random_user, 8)
+    control_period = user_packs[0].period_id
+    test_packs = packs.read_packs(db, period_id=control_period)
+    assert test_packs
+    assert all(pack in user_packs for pack in test_packs)
