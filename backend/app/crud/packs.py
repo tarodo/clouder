@@ -21,8 +21,8 @@ def create(db: Session, payload: PackInDB) -> Pack:
 
 
 def update(db: Session, db_obj: Pack, payload: PackUpdate) -> Pack:
-    pass
+    return common.update(db, db_obj, payload)
 
 
 def remove(db: Session, db_obj: Pack) -> Pack:
-    pass
+    return common.remove(db, db_obj)
