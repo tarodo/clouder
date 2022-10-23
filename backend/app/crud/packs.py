@@ -11,7 +11,7 @@ def read_one(
 
 
 def create(db: Session, payload: PackInDB) -> Pack:
-    pass
+    return common.create(db, Pack, payload)
 
 
 def update(db: Session, db_obj: Pack, payload: PackUpdate) -> Pack:
