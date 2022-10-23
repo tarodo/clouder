@@ -3,11 +3,17 @@ from app.models import Pack, PackInDB, PackUpdate
 from sqlmodel import Session, select
 
 
-def read_one(
-    db: Session, style_id: int | None, period_id: int | None
+def read_packs(
+    db: Session, style_id: int | None = None, period_id: int | None = None
 ) -> list[Pack] | None:
     """Read one pack by style and period"""
-    pass
+    pack_query = select(Pack)
+    if style_id:
+        pack_query = pack_query.where(Pack.style_id == style_id)
+    if period_id:
+        pack_query = pack_query.where(Pack.period_id == period_id)
+    pack = db.exec(pack_query).all()
+    return pack
 
 
 def create(db: Session, payload: PackInDB) -> Pack:
