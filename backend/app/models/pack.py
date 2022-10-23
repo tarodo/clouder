@@ -1,7 +1,6 @@
-from sqlalchemy import UniqueConstraint
-
 from app.models.periods import Period
 from app.models.styles import Style
+from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
 

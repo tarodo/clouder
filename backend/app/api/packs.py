@@ -3,8 +3,8 @@ from enum import Enum
 from app.api import deps
 from app.api.tools import raise_400
 from app.crud import packs
-from app.models import (Pack, PackInApi, PackInDB, PackOut,
-                        PackUpdate, User, responses)
+from app.models import (Pack, PackInApi, PackInDB, PackOut, PackUpdate, User,
+                        responses)
 from fastapi import APIRouter, Body, Depends
 from pydantic import ValidationError
 from sqlmodel import Session
@@ -31,13 +31,9 @@ def check_to_remove(user: User, one_pack: Pack) -> bool:
     pass
 
 
-create_examples = {
+create_examples = {}
 
-}
-
-update_example = {
-
-}
+update_example = {}
 
 
 @router.post("/", response_model=PackOut, status_code=200, responses=responses)
@@ -59,9 +55,7 @@ def read_my(
     pass
 
 
-@router.get(
-    "/{pack_id}/", response_model=PackOut, status_code=200, responses=responses
-)
+@router.get("/{pack_id}/", response_model=PackOut, status_code=200, responses=responses)
 def read(
     pack_id: int,
     current_user: User = Depends(deps.get_current_user),
@@ -71,9 +65,7 @@ def read(
     pass
 
 
-@router.put(
-    "/{pack_id}/", response_model=PackOut, status_code=200, responses=responses
-)
+@router.put("/{pack_id}/", response_model=PackOut, status_code=200, responses=responses)
 def update(
     pack_id: int,
     payload: PackUpdate = Body(examples=update_example),

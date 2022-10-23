@@ -1,8 +1,8 @@
 """add pack model
 
-Revision ID: 4cb3629c3567
+Revision ID: 015f5faee482
 Revises: 84c519ad3d53
-Create Date: 2022-10-23 11:11:36.612792
+Create Date: 2022-10-23 16:44:14.160484
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision = '4cb3629c3567'
+revision = '015f5faee482'
 down_revision = '84c519ad3d53'
 branch_labels = None
 depends_on = None
@@ -23,9 +23,11 @@ def upgrade():
     sa.Column('style_id', sa.Integer(), nullable=False),
     sa.Column('period_id', sa.Integer(), nullable=False),
     sa.Column('sheets_count', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['period_id'], ['period.id'], ),
     sa.ForeignKeyConstraint(['style_id'], ['style.id'], ),
-    sa.PrimaryKeyConstraint('style_id', 'period_id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('style_id', 'period_id')
     )
     # ### end Alembic commands ###
 

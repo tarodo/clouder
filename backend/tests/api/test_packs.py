@@ -6,7 +6,8 @@ from app.crud import packs
 from app.models import User
 from fastapi.testclient import TestClient
 from sqlmodel import Session
-from tests.utils.packs import (create_random_pack, create_random_packs, get_valid_pack_dict)
+from tests.utils.packs import (create_random_pack, create_random_packs,
+                               get_valid_pack_dict)
 from tests.utils.users import (create_random_user,
                                get_authentication_token_from_email)
 
