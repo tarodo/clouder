@@ -4,20 +4,35 @@ import math
 import random
 
 from app.crud import packs
-from app.models import Pack, PackInApi, PackInDB, User
+from app.models import Pack, PackInDB, User, PackInApi
 from sqlmodel import Session
 from tests.utils.periods import create_random_period, create_random_periods
 from tests.utils.styles import create_random_style, create_random_styles
-from tests.utils.utils import random_date, random_lower_string
 
 
-def create_random_pack(db: Session, user: User) -> Pack:
+def get_valid_pack_dict(db: Session, user: User, style_id: int | None = None, period_id: int | None = None) -> dict:
+    """Return valid dict of random pack"""
+    if not style_id:
+        style = create_random_style(db, user)
+        style_id = style.id
+    if not period_id:
+        period = create_random_period(db, user)
+        period_id = period.id
+    return {
+        "style_id": style_id,
+        "period_id": period_id,
+        "sheets_count": random.randint(1, 10),
+    }
+
+
+def get_valid_pack_in(db: Session, user: User, style_id: int | None = None, period_id: int | None = None) -> PackInDB:
+    """Return valid random PeriodInApi"""
+    return PackInDB(**get_valid_pack_dict(db, user, style_id, period_id))
+
+
+def create_random_pack(db: Session, user: User, style_id: int | None = None, period_id: int | None = None) -> Pack:
     """Create random pack for the user"""
-    style = create_random_style(db, user)
-    period = create_random_period(db, user)
-    pack_in = PackInDB(
-        style_id=style.id, period_id=period.id, sheets_count=random.randint(1, 10)
-    )
+    pack_in = get_valid_pack_in(db, user, style_id, period_id)
     return packs.create(db, payload=pack_in)
 
 

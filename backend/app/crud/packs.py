@@ -16,6 +16,10 @@ def read_packs(
     return pack
 
 
+def read_by_id(db: Session, pack_id: int) -> Pack | None:
+    return common.read_by_id(db, Pack, pack_id)
+
+
 def create(db: Session, payload: PackInDB) -> Pack:
     return common.create(db, Pack, payload)
 

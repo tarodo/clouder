@@ -1,6 +1,5 @@
 import datetime
 import json
-import logging
 
 from app.api.periods import PeriodsErrors
 from app.crud import periods
@@ -11,7 +10,6 @@ from tests.utils.periods import (create_random_period, create_random_periods,
                                  get_valid_period_dict, get_valid_period_in)
 from tests.utils.users import (create_random_user,
                                get_authentication_token_from_email)
-from tests.utils.utils import random_lower_string
 
 
 def test_period_create(client: TestClient, db: Session, random_user: User) -> None:

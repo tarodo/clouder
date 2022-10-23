@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import login, users, styles, periods
+from app.api import login, users, styles, periods, packs
 
 
 def create_application() -> FastAPI:
@@ -13,6 +13,7 @@ def create_application() -> FastAPI:
     application.include_router(users.router, prefix="/users", tags=["users"])
     application.include_router(styles.router, prefix="/styles", tags=["styles"])
     application.include_router(periods.router, prefix="/periods", tags=["periods"])
+    application.include_router(packs.router, prefix="/packs", tags=["packs"])
     application.include_router(login.router, tags=["login"])
     application.add_middleware(
         CORSMiddleware,
