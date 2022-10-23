@@ -33,6 +33,8 @@ class Period(PeriodBaseDB, table=True):
     id: int = Field(primary_key=True)
     user: User = Relationship(back_populates="periods")
 
+    packs: list["Pack"] = Relationship(back_populates="period")
+
 
 class PeriodInDB(PeriodBaseDB):
     pass

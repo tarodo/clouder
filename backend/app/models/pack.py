@@ -1,3 +1,5 @@
+from app.models.periods import Period
+from app.models.styles import Style
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -12,8 +14,8 @@ class PackBaseDB(PackBase):
 
 
 class Pack(PackBaseDB, table=True):
-    team: "Styles" = Relationship(back_populates="packs")
-    hero: "Periods" = Relationship(back_populates="packs")
+    style: Style = Relationship(back_populates="packs")
+    period: Period = Relationship(back_populates="packs")
 
 
 class PackInDB(PackBaseDB):

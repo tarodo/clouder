@@ -11,8 +11,8 @@ class User(UserBase, table=True):
     id: int = Field(primary_key=True)
     password: str = Field(...)
 
-    styles: "Style" = Relationship(back_populates="user")
-    periods: "Period" = Relationship(back_populates="user")
+    styles: list["Style"] = Relationship(back_populates="user")
+    periods: list["Period"] = Relationship(back_populates="user")
 
 
 class UserIn(UserBase):
