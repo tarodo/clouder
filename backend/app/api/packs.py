@@ -1,8 +1,9 @@
+import logging
 from enum import Enum
 
 from app.api import deps
 from app.api.tools import raise_400
-from app.crud import packs
+from app.crud import packs, periods, styles
 from app.models import (Pack, PackInApi, PackInDB, PackOut, PackUpdate, User,
                         responses)
 from fastapi import APIRouter, Body, Depends
@@ -13,7 +14,19 @@ router = APIRouter()
 
 
 class PacksErrors(Enum):
-    pass
+    PackAlreadyExists = "Pack already exists"
+    UserHasNoRights = "User has no rights"
+
+
+def check_to_create(db: Session, user: User, one_pack_in: PackInApi) -> bool:
+    """Check if the user has create permission"""
+    style = styles.read_by_id(db, one_pack_in.style_id)
+    if not style or (style.user is not user):
+        return False
+    period = periods.read_by_id(db, one_pack_in.period_id)
+    if not period or (period.user is not user):
+        return False
+    return True
 
 
 def check_to_read(user: User, one_pack: Pack) -> bool:
@@ -43,7 +56,14 @@ def create_pack(
     db: Session = Depends(deps.get_db),
 ) -> Pack:
     """Create one pack"""
-    pass
+    old_pack = packs.read_packs(db, payload.style_id, payload.period_id)
+    if old_pack:
+        raise_400(PacksErrors.PackAlreadyExists)
+    if not check_to_create(db, current_user, payload):
+        raise_400(PacksErrors.UserHasNoRights)
+    pack_in = PackInDB(**payload.dict())
+    pack = packs.create(db, pack_in)
+    return pack
 
 
 @router.get("/", response_model=list[PackOut], status_code=200, responses=responses)
