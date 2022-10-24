@@ -15,6 +15,7 @@ router = APIRouter()
 
 class PacksErrors(Enum):
     PackAlreadyExists = "Pack already exists"
+    PackDoesNotExist = "Pack does not exist"
     UserHasNoRights = "User has no rights"
     UserHasNoAccess = "User has no access"
     NotEnoughParams = "Not valid count of query params"
@@ -48,6 +49,17 @@ def check_to_read_by_style_period(
         if one_period.user is not user:
             return False
     return True
+
+
+def check_to_read(user: User, one_pack: Pack) -> bool:
+    """Check if the user has read permission"""
+    if user.is_admin:
+        return True
+    one_style = one_pack.style
+    one_period = one_pack.period
+    if user is one_style.user and user is one_period.user:
+        return True
+    return False
 
 
 def check_to_update(user: User, one_pack: Pack) -> bool:
@@ -106,7 +118,14 @@ def read(
     db: Session = Depends(deps.get_db),
 ) -> Pack | None:
     """Retrieve a pack by id"""
-    pass
+    one_pack = packs.read_by_id(db, pack_id)
+    if one_pack:
+        if check_to_read(current_user, one_pack):
+            return one_pack
+    else:
+        if current_user.is_admin:
+            return raise_400(PacksErrors.PeriodDoesNotExist)
+    return raise_400(PacksErrors.UserHasNoAccess)
 
 
 @router.put("/{pack_id}/", response_model=PackOut, status_code=200, responses=responses)
