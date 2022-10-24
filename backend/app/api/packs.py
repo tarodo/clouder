@@ -6,7 +6,7 @@ from app.api.tools import raise_400
 from app.crud import packs, periods, styles
 from app.models import (Pack, PackInApi, PackInDB, PackOut, PackUpdate, User,
                         responses)
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, Query
 from pydantic import ValidationError
 from sqlmodel import Session
 
@@ -16,6 +16,7 @@ router = APIRouter()
 class PacksErrors(Enum):
     PackAlreadyExists = "Pack already exists"
     UserHasNoRights = "User has no rights"
+    UserHasNoAccess = "User has no access"
 
 
 def check_to_create(db: Session, user: User, one_pack_in: PackInApi) -> bool:
@@ -67,11 +68,13 @@ def create_pack(
 
 
 @router.get("/", response_model=list[PackOut], status_code=200, responses=responses)
-def read_my(
+def read_many(
+    style_id: int | None = Query(..., ge=1),
+    period_id: int | None = Query(..., ge=1),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> list[Pack] | None:
-    """Retrieve all packs for the user"""
+    """Retrieve all packs for style and period"""
     pass
 
 
