@@ -17,6 +17,7 @@ class PacksErrors(Enum):
     PackAlreadyExists = "Pack already exists"
     UserHasNoRights = "User has no rights"
     UserHasNoAccess = "User has no access"
+    NotEnoughParams = "Not valid count of query params"
 
 
 def check_to_create(db: Session, user: User, one_pack_in: PackInApi) -> bool:
@@ -30,9 +31,23 @@ def check_to_create(db: Session, user: User, one_pack_in: PackInApi) -> bool:
     return True
 
 
-def check_to_read(user: User, one_pack: Pack) -> bool:
+def check_to_read_by_style_period(
+    db: Session, user: User, style_id: int | None = None, period_id: int | None = None
+) -> bool:
     """Check if the user has read permission"""
-    pass
+    if style_id:
+        one_style = styles.read_by_id(db, style_id)
+        if not one_style:
+            return False
+        if one_style.user is not user:
+            return False
+    if period_id:
+        one_period = periods.read_by_id(db, period_id)
+        if not one_period:
+            return False
+        if one_period.user is not user:
+            return False
+    return True
 
 
 def check_to_update(user: User, one_pack: Pack) -> bool:
@@ -69,13 +84,19 @@ def create_pack(
 
 @router.get("/", response_model=list[PackOut], status_code=200, responses=responses)
 def read_many(
-    style_id: int | None = Query(..., ge=1),
-    period_id: int | None = Query(..., ge=1),
+    style_id: int | None = Query(None, ge=1),
+    period_id: int | None = Query(None, ge=1),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> list[Pack] | None:
     """Retrieve all packs for style and period"""
-    pass
+    if not style_id and not period_id:
+        raise_400(PacksErrors.NotEnoughParams)
+    if not current_user.is_admin:
+        if not check_to_read_by_style_period(db, current_user, style_id, period_id):
+            raise_400(PacksErrors.UserHasNoAccess)
+    query_packs = packs.read_packs(db, style_id, period_id)
+    return query_packs
 
 
 @router.get("/{pack_id}/", response_model=PackOut, status_code=200, responses=responses)

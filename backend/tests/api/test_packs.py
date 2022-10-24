@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 
 from app.api.packs import PacksErrors
 from app.crud import packs
@@ -74,12 +75,11 @@ def test_pack_create_same(client: TestClient, db: Session, random_user: User) ->
     assert one_pack["detail"]["type"] == str(PacksErrors.PackAlreadyExists)
 
 
-def test_pack_read_by_style_period(client: TestClient, db: Session, random_user: User) -> None:
+def test_pack_read_by_style_period(
+    client: TestClient, db: Session, random_user: User
+) -> None:
     user_packs = create_random_packs(db, random_user)
-    params = {
-        "style_id": user_packs[0].style_id,
-        "period_id": user_packs[0].period_id
-    }
+    params = {"style_id": user_packs[0].style_id, "period_id": user_packs[0].period_id}
     pack_id = user_packs[0].id
     user_token_headers = get_authentication_token_from_email(
         client=client, email=random_user.email, db=db
@@ -109,7 +109,9 @@ def test_pack_read_by_style(client: TestClient, db: Session, random_user: User) 
     assert ret_ids.issubset(pack_ids)
 
 
-def test_pack_read_by_period(client: TestClient, db: Session, random_user: User) -> None:
+def test_pack_read_by_period(
+    client: TestClient, db: Session, random_user: User
+) -> None:
     user_packs = create_random_packs(db, random_user)
     params = {
         "period_id": user_packs[0].period_id,
@@ -126,14 +128,13 @@ def test_pack_read_by_period(client: TestClient, db: Session, random_user: User)
     assert ret_ids.issubset(pack_ids)
 
 
-def test_pack_read_another_style(client: TestClient, db: Session, random_user: User) -> None:
+def test_pack_read_another_style(
+    client: TestClient, db: Session, random_user: User
+) -> None:
     user_packs = create_random_packs(db, random_user, 3)
     another_user = create_random_user(db)
     another_pack = create_random_pack(db, another_user)
-    params = {
-        "style_id": another_pack.style_id,
-        "period_id": user_packs[0].period_id
-    }
+    params = {"style_id": another_pack.style_id, "period_id": user_packs[0].period_id}
     user_token_headers = get_authentication_token_from_email(
         client=client, email=random_user.email, db=db
     )
@@ -143,14 +144,13 @@ def test_pack_read_another_style(client: TestClient, db: Session, random_user: U
     assert one_pack["detail"]["type"] == str(PacksErrors.UserHasNoAccess)
 
 
-def test_pack_read_another_period(client: TestClient, db: Session, random_user: User) -> None:
+def test_pack_read_another_period(
+    client: TestClient, db: Session, random_user: User
+) -> None:
     user_packs = create_random_packs(db, random_user, 3)
     another_user = create_random_user(db)
     another_pack = create_random_pack(db, another_user)
-    params = {
-        "style_id": user_packs[0].period_id,
-        "period_id": another_pack.period_id
-    }
+    params = {"style_id": user_packs[0].period_id, "period_id": another_pack.period_id}
     user_token_headers = get_authentication_token_from_email(
         client=client, email=random_user.email, db=db
     )
@@ -160,16 +160,13 @@ def test_pack_read_another_period(client: TestClient, db: Session, random_user: 
     assert one_pack["detail"]["type"] == str(PacksErrors.UserHasNoAccess)
 
 
-def test_pack_read_my(client: TestClient, db: Session, random_user: User) -> None:
+def test_pack_read_empty(client: TestClient, db: Session, random_user: User) -> None:
     user_packs = create_random_packs(db, random_user)
     params = {}
-    pack_ids = set(pack.id for pack in user_packs)
     user_token_headers = get_authentication_token_from_email(
         client=client, email=random_user.email, db=db
     )
     r = client.get(f"/packs/", params=params, headers=user_token_headers)
-    assert 200 <= r.status_code < 300
-    ret_packs = r.json()
-    assert ret_packs
-    ret_ids = set(one_pack["id"] for one_pack in ret_packs)
-    assert ret_ids.issubset(pack_ids)
+    assert r.status_code == 400
+    one_pack = r.json()
+    assert one_pack["detail"]["type"] == str(PacksErrors.NotEnoughParams)
