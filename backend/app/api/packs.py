@@ -61,14 +61,9 @@ def check_to_read(user: User, one_pack: Pack) -> bool:
     return False
 
 
-def check_to_update(user: User, one_pack: Pack) -> bool:
-    """Check if the user has update permission"""
-    pass
-
-
 def check_to_remove(user: User, one_pack: Pack) -> bool:
     """Check if the user has delete permission"""
-    pass
+    return check_to_read(user, one_pack)
 
 
 create_examples = {}
@@ -136,4 +131,12 @@ def remove(
     db: Session = Depends(deps.get_db),
 ) -> Pack | None:
     """Remove the pack by id"""
-    pass
+    one_pack = packs.read_by_id(db, pack_id)
+    if not one_pack:
+        if current_user.is_admin:
+            return raise_400(PacksErrors.PeriodDoesNotExist)
+        return raise_400(PacksErrors.UserHasNoRights)
+    if not check_to_remove(current_user, one_pack):
+        return raise_400(PacksErrors.UserHasNoRights)
+
+    return packs.remove(db, one_pack)

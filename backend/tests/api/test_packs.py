@@ -219,7 +219,7 @@ def test_pack_remove(client: TestClient, db: Session, random_user: User) -> None
     user_token_headers = get_authentication_token_from_email(
         client=client, email=random_user.email, db=db
     )
-    r = client.delete(f"/packs/{pack_id}", headers=user_token_headers)
+    r = client.delete(f"/packs/{pack_id}/", headers=user_token_headers)
     assert 200 <= r.status_code < 300
     one_pack = r.json()
     assert one_pack
@@ -234,7 +234,7 @@ def test_pack_remove_by_admin(
     random_user = create_random_user(db)
     user_pack = create_random_pack(db, random_user)
     pack_id = user_pack.id
-    r = client.delete(f"/packs/{pack_id}", headers=superuser_token_headers)
+    r = client.delete(f"/packs/{pack_id}/", headers=superuser_token_headers)
     assert 200 <= r.status_code < 300
     one_pack = r.json()
     assert one_pack
@@ -252,7 +252,7 @@ def test_pack_remove_another(
     user_token_headers = get_authentication_token_from_email(
         client=client, email=random_user.email, db=db
     )
-    r = client.delete(f"/packs/{pack_id}", headers=user_token_headers)
+    r = client.delete(f"/packs/{pack_id}/", headers=user_token_headers)
     assert r.status_code == 400
     one_pack = r.json()
     assert one_pack["detail"]["type"] == str(PacksErrors.UserHasNoRights)
