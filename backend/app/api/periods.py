@@ -208,7 +208,7 @@ def remove(
     if not one_period:
         if current_user.is_admin:
             return raise_400(PeriodsErrors.PeriodDoesNotExist)
-        return raise_400(PeriodsErrors.UserHasNoAccess)
+        return raise_400(PeriodsErrors.UserHasNoRights)
     if not check_to_remove(current_user, one_period):
         return raise_400(PeriodsErrors.UserHasNoRights)
 

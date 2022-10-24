@@ -426,7 +426,7 @@ def test_period_remove_wrong_id(
     r = client.delete(f"/periods/{wrong_id}/", headers=user_token_headers)
     assert r.status_code == 400
     one_period = r.json()
-    assert one_period["detail"]["type"] == str(PeriodsErrors.UserHasNoAccess)
+    assert one_period["detail"]["type"] == str(PeriodsErrors.UserHasNoRights)
 
 
 def test_period_remove_wrong_id_admin(

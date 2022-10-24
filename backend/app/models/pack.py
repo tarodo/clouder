@@ -30,11 +30,5 @@ class PackOut(PackBaseDB):
     id: int = Field(...)
 
 
-class PackUpdate(PackBase):
-    style_id: int | None = None
-    period_id: int | None = None
-    sheets_count: int | None = None
-
-
 class PackInApi(PackBase):
     pass

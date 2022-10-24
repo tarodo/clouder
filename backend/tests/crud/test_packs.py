@@ -1,14 +1,11 @@
-import datetime
-import logging
 import random
 
 from app.crud import packs
-from app.models import PackInDB, PackUpdate, User
+from app.models import PackInDB, User
 from sqlmodel import Session
 from tests.utils.packs import create_random_pack, create_random_packs
 from tests.utils.periods import create_random_period
 from tests.utils.styles import create_random_style
-from tests.utils.utils import random_lower_string
 
 
 def test_pack_create(db: Session, random_user: User) -> None:

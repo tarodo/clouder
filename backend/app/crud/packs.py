@@ -1,5 +1,5 @@
 from app.crud import common
-from app.models import Pack, PackInDB, PackUpdate
+from app.models import Pack, PackInDB
 from sqlmodel import Session, select
 
 
@@ -22,10 +22,6 @@ def read_by_id(db: Session, pack_id: int) -> Pack | None:
 
 def create(db: Session, payload: PackInDB) -> Pack:
     return common.create(db, Pack, payload)
-
-
-def update(db: Session, db_obj: Pack, payload: PackUpdate) -> Pack:
-    return common.update(db, db_obj, payload)
 
 
 def remove(db: Session, db_obj: Pack) -> Pack:

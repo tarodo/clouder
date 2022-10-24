@@ -4,8 +4,7 @@ from enum import Enum
 from app.api import deps
 from app.api.tools import raise_400
 from app.crud import packs, periods, styles
-from app.models import (Pack, PackInApi, PackInDB, PackOut, PackUpdate, User,
-                        responses)
+from app.models import Pack, PackInApi, PackInDB, PackOut, User, responses
 from fastapi import APIRouter, Body, Depends, Query
 from pydantic import ValidationError
 from sqlmodel import Session
@@ -126,17 +125,6 @@ def read(
         if current_user.is_admin:
             return raise_400(PacksErrors.PeriodDoesNotExist)
     return raise_400(PacksErrors.UserHasNoAccess)
-
-
-@router.put("/{pack_id}/", response_model=PackOut, status_code=200, responses=responses)
-def update(
-    pack_id: int,
-    payload: PackUpdate = Body(examples=update_example),
-    current_user: User = Depends(deps.get_current_user),
-    db: Session = Depends(deps.get_db),
-) -> Pack | None:
-    """Update the pack for the user"""
-    pass
 
 
 @router.delete(
