@@ -22,6 +22,8 @@ class Style(StyleBaseDB, table=True):
     id: int = Field(primary_key=True)
     user: User = Relationship(back_populates="styles")
 
+    packs: list["Pack"] = Relationship(back_populates="style")
+
 
 class StyleInDB(StyleBaseDB):
     pass

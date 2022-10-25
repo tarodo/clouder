@@ -1,6 +1,5 @@
 import datetime
 import json
-import logging
 
 from app.api.periods import PeriodsErrors
 from app.crud import periods
@@ -11,7 +10,6 @@ from tests.utils.periods import (create_random_period, create_random_periods,
                                  get_valid_period_dict, get_valid_period_in)
 from tests.utils.users import (create_random_user,
                                get_authentication_token_from_email)
-from tests.utils.utils import random_lower_string
 
 
 def test_period_create(client: TestClient, db: Session, random_user: User) -> None:
@@ -428,7 +426,7 @@ def test_period_remove_wrong_id(
     r = client.delete(f"/periods/{wrong_id}/", headers=user_token_headers)
     assert r.status_code == 400
     one_period = r.json()
-    assert one_period["detail"]["type"] == str(PeriodsErrors.UserHasNoAccess)
+    assert one_period["detail"]["type"] == str(PeriodsErrors.UserHasNoRights)
 
 
 def test_period_remove_wrong_id_admin(
