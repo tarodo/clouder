@@ -68,7 +68,7 @@ def check_to_remove(user: User, one_pack: Pack) -> bool:
 
 @router.post("/", response_model=PackOut, status_code=200, responses=responses)
 def create_pack(
-    payload: PackInApi = Body(examples=create_examples),
+    payload: PackInApi,
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Pack:
