@@ -66,11 +66,6 @@ def check_to_remove(user: User, one_pack: Pack) -> bool:
     return check_to_read(user, one_pack)
 
 
-create_examples = {}
-
-update_example = {}
-
-
 @router.post("/", response_model=PackOut, status_code=200, responses=responses)
 def create_pack(
     payload: PackInApi = Body(examples=create_examples),
