@@ -8,7 +8,7 @@ url_con = constr(min_length=1)
 class LabelBase(SQLModel):
     name: name_con = Field(index=True, nullable=False)
     url: url_con = Field(nullable=False)
-    bp_id: int = Field(index=True, nullable=False)
+    bp_id: int = Field(index=True, nullable=False, sa_column_kwargs={"unique": True})
 
 
 class LabelBaseDB(LabelBase):
