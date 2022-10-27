@@ -1,6 +1,8 @@
 from pydantic import EmailStr, constr
 from sqlmodel import Field, Relationship, SQLModel
 
+pass_con = constr(min_length=6, max_length=255)
+
 
 class UserBase(SQLModel):
     email: EmailStr = Field(index=True, sa_column_kwargs={"unique": True})
@@ -9,14 +11,14 @@ class UserBase(SQLModel):
 
 class User(UserBase, table=True):
     id: int = Field(primary_key=True)
-    password: str = Field(...)
+    password: pass_con = Field(...)
 
     styles: list["Style"] = Relationship(back_populates="user")
     periods: list["Period"] = Relationship(back_populates="user")
 
 
 class UserIn(UserBase):
-    password: constr(min_length=6) = Field(...)
+    password: pass_con = Field(...)
 
 
 class UserOut(UserBase):
@@ -25,5 +27,5 @@ class UserOut(UserBase):
 
 class UserUpdate(SQLModel):
     email: EmailStr | None = None
-    password: str | None = None
+    password: pass_con | None = None
     is_admin: bool | None = None

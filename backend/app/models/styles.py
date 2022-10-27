@@ -4,7 +4,7 @@ from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
 # TODO: Change vars to enums
-name_con = constr(min_length=1)
+name_con = constr(min_length=1, max_length=127)
 link_con = constr(min_length=1)
 
 

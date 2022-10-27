@@ -5,7 +5,7 @@ from pydantic import constr, root_validator
 from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
-name_con = constr(min_length=1)
+name_con = constr(min_length=1, max_length=127)
 
 
 class PeriodBase(SQLModel):
