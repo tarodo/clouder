@@ -5,8 +5,7 @@ from sqlmodel import Session, select
 
 def read_by_name(db: Session, name: str) -> list[Label] | None:
     """Read one label by name"""
-    label = select(Label).where(Label.name == name)
-    label = db.exec(label).first()
+    label = common.read_by_field(db, Label.name, name)
     return label
 
 

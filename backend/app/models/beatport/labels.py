@@ -1,7 +1,7 @@
 from pydantic import constr
 from sqlmodel import Field, SQLModel
 
-name_con = constr(min_length=1)
+name_con = constr(min_length=1, max_length=127)
 url_con = constr(min_length=1)
 
 

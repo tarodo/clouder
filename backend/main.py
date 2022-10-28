@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import login, users, styles, periods, packs
+from app.api.beatport import labels
 
 
 def create_application() -> FastAPI:
@@ -14,6 +15,7 @@ def create_application() -> FastAPI:
     application.include_router(styles.router, prefix="/styles", tags=["styles"])
     application.include_router(periods.router, prefix="/periods", tags=["periods"])
     application.include_router(packs.router, prefix="/packs", tags=["packs"])
+    application.include_router(labels.router, prefix="/labels", tags=["labels"])
     application.include_router(login.router, tags=["login"])
     application.add_middleware(
         CORSMiddleware,

@@ -5,7 +5,7 @@ from tests.utils.beatport import create_random_label
 from tests.utils.utils import random_bp_id, random_lower_string
 
 
-def test_label_create(db: Session, random_user: User) -> None:
+def test_label_create(db: Session) -> None:
     label_in = LabelInDB(
         name=random_lower_string(8),
         url=random_lower_string(8),
@@ -17,13 +17,13 @@ def test_label_create(db: Session, random_user: User) -> None:
     assert label.bp_id == label_in.bp_id
 
 
-def test_label_read_by_id(db: Session, random_user: User) -> None:
+def test_label_read_by_id(db: Session) -> None:
     label = create_random_label(db)
     test_label = labels.read_by_id(db, label.id)
     assert test_label == label
 
 
-def test_label_read_by_name(db: Session, random_user: User) -> None:
+def test_label_read_by_name(db: Session) -> None:
     label = create_random_label(db)
     test_label = labels.read_by_name(db, label.name)
     assert test_label == label
