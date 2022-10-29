@@ -56,6 +56,35 @@ def test_label_get_by_bp_id(
     assert ret_labels
     assert len(ret_labels) == 1
     created_label = ret_labels[0]
+    assert created_label["id"] == label.id
     assert created_label["name"] == label.name
     assert created_label["url"] == label.url
     assert created_label["bp_id"] == label.bp_id
+
+
+def test_label_get_by_id(client: TestClient, db: Session, user_token_headers) -> None:
+    label = create_random_label(db)
+    create_random_label(db, name=label.name)
+    r = client.get(f"/labels/{label.id}", headers=user_token_headers)
+    assert 200 <= r.status_code < 300
+    created_label = r.json()
+    assert created_label
+    assert created_label["id"] == label.id
+    assert created_label["name"] == label.name
+    assert created_label["url"] == label.url
+    assert created_label["bp_id"] == label.bp_id
+
+
+def test_label_remove(client: TestClient, db: Session, user_token_headers) -> None:
+    label = create_random_label(db)
+    create_random_label(db, name=label.name)
+    r = client.delete(f"/labels/{label.id}/", headers=user_token_headers)
+    assert 200 <= r.status_code < 300
+    deleted_label = r.json()
+    assert deleted_label
+    assert deleted_label["id"] == label.id
+    assert deleted_label["name"] == label.name
+    assert deleted_label["url"] == label.url
+    assert deleted_label["bp_id"] == label.bp_id
+    test_label = labels.read_by_id(db, label.id)
+    assert not test_label

@@ -47,10 +47,10 @@ def read_many(
 ) -> list[Label] | None:
     """Retrieve labels by name or beatport ID"""
     q_labels = []
-    if name:
-        q_labels = labels.read_by_name(db, name)
     if bp_id:
         q_labels = [labels.read_by_bp_id(db, bp_id)]
+    elif name:
+        q_labels = labels.read_by_name(db, name)
     return q_labels
 
 
