@@ -1,14 +1,8 @@
-import datetime
-import json
-
 from app.api.beatport.labels import LabelsErrors
 from app.crud.beatport import labels
-from app.models import User
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 from tests.utils.beatport import create_random_label
-from tests.utils.users import (create_random_user,
-                               get_authentication_token_from_email)
 from tests.utils.utils import random_bp_id
 
 

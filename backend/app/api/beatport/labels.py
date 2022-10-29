@@ -1,4 +1,3 @@
-import logging
 from enum import Enum
 
 from app.api import deps
@@ -6,8 +5,7 @@ from app.api.tools import raise_400
 from app.crud.beatport import labels
 from app.models import Label, LabelInApi, LabelInDB, LabelOut, User, responses
 from app.models.beatport.labels import name_con
-from fastapi import APIRouter, Body, Depends, Query
-from pydantic import ValidationError
+from fastapi import APIRouter, Body, Depends, Path, Query
 from sqlmodel import Session
 
 router = APIRouter()
@@ -41,10 +39,7 @@ def create_label(
     "/findByName", response_model=list[LabelOut], status_code=200, responses=responses
 )
 def read_many(
-    name: str
-    | None = Query(
-        None, min_length=name_con.min_length, max_length=name_con.max_length
-    ),
+    name: name_con = Query(...),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> list[Label] | None:
@@ -68,7 +63,7 @@ def read_many(
     "/{label_id}/", response_model=LabelOut, status_code=200, responses=responses
 )
 def read(
-    label_id: int,
+    label_id: int = Path(..., gt=0),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Label | None:
@@ -83,7 +78,7 @@ def read(
     "/{label_id}/", response_model=LabelOut, status_code=200, responses=responses
 )
 def remove(
-    label_id: int,
+    label_id: int = Path(..., gt=0),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Label | None:
