@@ -4,8 +4,14 @@ from sqlmodel import Session, select
 
 
 def read_by_name(db: Session, name: str) -> list[Label] | None:
-    """Read one label by name"""
-    label = common.read_by_field(db, Label.name, name)
+    """Read labels by name"""
+    label = common.read_by_field_many(db, Label.name, name)
+    return label
+
+
+def read_by_bp_id(db: Session, bp_id: int) -> Label | None:
+    """Read label by beatport id"""
+    label = common.read_by_field(db, Label.bp_id, bp_id)
     return label
 
 

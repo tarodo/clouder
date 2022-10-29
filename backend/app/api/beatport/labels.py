@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 
 from app.api import deps
@@ -22,11 +23,16 @@ create_examples = {}
 @router.post("/", response_model=LabelOut, status_code=200, responses=responses)
 def create_label(
     payload: LabelInApi = Body(examples=create_examples),
-    current_user: User = Depends(deps.get_current_user),
+    _: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Label:
     """Create one label"""
-    pass
+    old_label = labels.read_by_bp_id(db, payload.bp_id)
+    if old_label:
+        raise_400(LabelsErrors.PeriodAlreadyExists)
+    label_in = LabelInDB(**payload.dict())
+    label = labels.create(db, label_in)
+    return label
 
 
 @router.get("/", response_model=list[LabelOut], status_code=200, responses=responses)
@@ -40,7 +46,12 @@ def read_many(
     db: Session = Depends(deps.get_db),
 ) -> list[Label] | None:
     """Retrieve labels by name or beatport ID"""
-    pass
+    q_labels = []
+    if name:
+        q_labels = labels.read_by_name(db, name)
+    if bp_id:
+        q_labels = [labels.read_by_bp_id(db, bp_id)]
+    return q_labels
 
 
 @router.get(

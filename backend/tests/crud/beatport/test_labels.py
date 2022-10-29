@@ -26,4 +26,15 @@ def test_label_read_by_id(db: Session) -> None:
 def test_label_read_by_name(db: Session) -> None:
     label = create_random_label(db)
     test_label = labels.read_by_name(db, label.name)
+    assert test_label == [label]
+
+
+def test_label_read_by_bp_id(db: Session) -> None:
+    label = create_random_label(db)
+    test_label = labels.read_by_bp_id(db, label.bp_id)
     assert test_label == label
+
+
+def test_label_read_by_bp_id_wrong(db: Session) -> None:
+    test_label = labels.read_by_bp_id(db, -1)
+    assert not test_label

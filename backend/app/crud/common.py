@@ -17,6 +17,15 @@ def read_by_field(db: Session, Field: InstrumentedAttribute, value) -> SQLModel 
     return elem
 
 
+def read_by_field_many(
+    db: Session, Field: InstrumentedAttribute, value
+) -> list[SQLModel] | None:
+    """Read elements by field value"""
+    elem = select(Field.class_).where(Field == value)
+    elem = db.exec(elem).all()
+    return elem
+
+
 def create(db: Session, Model, payload: SQLModel):
     """Create an element"""
     element = Model(**payload.dict())
