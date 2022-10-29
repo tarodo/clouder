@@ -37,7 +37,7 @@ def test_label_get_by_name(client: TestClient, db: Session, user_token_headers) 
     label = create_random_label(db)
     create_random_label(db, name=label.name)
     params = {"name": label.name}
-    r = client.get(f"/labels/", params=params, headers=user_token_headers)
+    r = client.get(f"/labels/findByName", params=params, headers=user_token_headers)
     assert 200 <= r.status_code < 300
     ret_labels = r.json()
     assert ret_labels
@@ -50,12 +50,10 @@ def test_label_get_by_bp_id(
 ) -> None:
     label = create_random_label(db)
     params = {"bp_id": label.bp_id}
-    r = client.get(f"/labels/", params=params, headers=user_token_headers)
+    r = client.get(f"/labels/findByBpId", params=params, headers=user_token_headers)
     assert 200 <= r.status_code < 300
-    ret_labels = r.json()
-    assert ret_labels
-    assert len(ret_labels) == 1
-    created_label = ret_labels[0]
+    created_label = r.json()
+    assert created_label
     assert created_label["id"] == label.id
     assert created_label["name"] == label.name
     assert created_label["url"] == label.url
