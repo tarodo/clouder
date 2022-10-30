@@ -1,9 +1,13 @@
-from app.models.beatport.releases import ReleaseArtist
 from pydantic import constr
 from sqlmodel import Field, Relationship, SQLModel
 
 name_con = constr(min_length=1, max_length=127)
 url_con = constr(min_length=1)
+
+
+class ReleaseArtist(SQLModel, table=True):
+    release_id: int = Field(foreign_key="release.id", primary_key=True)
+    artist_id: int = Field(foreign_key="artist.id", primary_key=True)
 
 
 class ArtistBase(SQLModel):
@@ -19,7 +23,7 @@ class ArtistBaseDB(ArtistBase):
 class Artist(ArtistBaseDB, table=True):
     id: int = Field(primary_key=True)
 
-    releases: list["Release"] = Relationship(
+    releases: list["Release"] | None = Relationship(
         back_populates="artists", link_model=ReleaseArtist
     )
 
@@ -34,3 +38,6 @@ class ArtistOut(ArtistBaseDB):
 
 class ArtistInApi(ArtistBase):
     pass
+
+
+ArtistOut.update_forward_refs()
