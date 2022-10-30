@@ -1,5 +1,5 @@
 from pydantic import constr
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
 
 name_con = constr(min_length=1, max_length=127)
 url_con = constr(min_length=1)
@@ -17,6 +17,8 @@ class LabelBaseDB(LabelBase):
 
 class Label(LabelBaseDB, table=True):
     id: int = Field(primary_key=True)
+
+    releases: list["Release"] = Relationship(back_populates="label")
 
 
 class LabelInDB(LabelBaseDB):
