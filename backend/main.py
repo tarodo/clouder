@@ -40,7 +40,7 @@ tags_metadata = [
 
 def create_application() -> FastAPI:
     application = FastAPI(
-        title="cLoudER Space", version="0.3.3", openapi_tags=tags_metadata
+        title="cLoudER Space", version="0.3.4", openapi_tags=tags_metadata
     )
     application.include_router(users.router, prefix="/users", tags=["users"])
     application.include_router(styles.router, prefix="/styles", tags=["styles"])
