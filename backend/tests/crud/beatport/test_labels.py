@@ -1,5 +1,5 @@
 from app.crud.beatport import labels
-from app.models import LabelInDB, User
+from app.models import LabelInDB
 from sqlmodel import Session
 from tests.utils.beatport import create_random_label
 from tests.utils.utils import random_bp_id, random_lower_string

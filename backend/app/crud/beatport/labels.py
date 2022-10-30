@@ -1,6 +1,6 @@
 from app.crud import common
 from app.models import Label, LabelInDB
-from sqlmodel import Session, select
+from sqlmodel import Session
 
 
 def read_by_name(db: Session, name: str) -> list[Label] | None:

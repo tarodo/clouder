@@ -1,3 +1,4 @@
+from .beatport.artists import Artist, ArtistInApi, ArtistInDB, ArtistOut
 from .beatport.labels import Label, LabelInApi, LabelInDB, LabelOut
 from .pack import Pack, PackInApi, PackInDB, PackOut
 from .periods import Period, PeriodInApi, PeriodInDB, PeriodOut, PeriodUpdate
