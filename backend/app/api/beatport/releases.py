@@ -1,0 +1,111 @@
+from enum import Enum
+
+from app.api import deps
+from app.api.tools import raise_400
+from app.crud.beatport import artists, labels, releases
+from app.models import (Release, ReleaseInApi, ReleaseInDB, ReleaseOut, User,
+                        responses)
+from app.models.beatport.releases import name_con
+from fastapi import APIRouter, Body, Depends, Path, Query
+from sqlmodel import Session
+
+router = APIRouter()
+
+
+class ReleasesErrors(Enum):
+    ReleaseAlreadyExists = "Release already exists"
+    ReleaseDoesNotExist = "Release does not exist"
+    UserHasNoRights = "User has no rights"
+    ArtistDoesNotExists = "Artist does not exist"
+    LabelDoesNotExists = "Label does not exist"
+
+
+@router.post("/", response_model=ReleaseOut, status_code=200, responses=responses)
+def create_release(
+    payload: ReleaseInApi = Body(examples=create_examples),
+    _: User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db),
+) -> Release:
+    """Create one release"""
+    if payload.label_id:
+        q_label = labels.read_by_id(db, payload.label_id)
+        if not q_label:
+            raise_400(ReleasesErrors.LabelDoesNotExists)
+
+    q_artists = []
+    if payload.artists_id:
+        for art_id in payload.artists_id:
+            art_db = artists.read_by_id(db, art_id)
+            if not art_db:
+                raise_400(ReleasesErrors.ArtistDoesNotExists)
+            q_artists.append(art_db)
+    release_in = ReleaseInDB(**payload.dict())
+    return releases.create(db, release_in, q_artists)
+
+
+@router.get(
+    "/findByName", response_model=list[ReleaseOut], status_code=200, responses=responses
+)
+def read_many(
+    name: name_con = Query(...),
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db),
+) -> list[Release] | None:
+    """Retrieve releases by name"""
+    return releases.read_by_name(db, name)
+
+
+@router.get(
+    "/findByBpId", response_model=ReleaseOut, status_code=200, responses=responses
+)
+def read_many(
+    bp_id: int | None = Query(None, ge=1),
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db),
+) -> list[Release] | None:
+    """Retrieve one release by beatport ID"""
+    return releases.read_by_bp_id(db, bp_id)
+
+
+@router.get(
+    "/findByLabelId", response_model=ReleaseOut, status_code=200, responses=responses
+)
+def read_many(
+    label_id: int | None = Query(None, ge=1),
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db),
+) -> list[Release] | None:
+    """Retrieve one release by Label ID"""
+    pass
+
+
+@router.get(
+    "/{release_id}/", response_model=ReleaseOut, status_code=200, responses=responses
+)
+def read(
+    release_id: int = Path(..., gt=0),
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db),
+) -> Release | None:
+    """Retrieve a release by id"""
+    one_release = releases.read_by_id(db, release_id)
+    if not one_release:
+        raise_400(ReleasesErrors.ReleaseDoesNotExist)
+    return one_release
+
+
+@router.delete(
+    "/{release_id}/", response_model=ReleaseOut, status_code=200, responses=responses
+)
+def remove(
+    release_id: int = Path(..., gt=0),
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db),
+) -> Release | None:
+    """Remove the release by id. Only admin can delete a release."""
+    if not current_user.is_admin:
+        raise_400(ReleasesErrors.UserHasNoRights)
+    one_release = releases.read_by_id(db, release_id)
+    if not one_release:
+        raise_400(ReleasesErrors.ReleaseDoesNotExist)
+    return releases.remove(db, one_release)

@@ -1,6 +1,6 @@
 import uvicorn
 from app.api import login, packs, periods, styles, users
-from app.api.beatport import artists, labels
+from app.api.beatport import artists, labels, releases
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -35,6 +35,11 @@ tags_metadata = [
         "description": "Artists are for saving beatport artist's information, their IDs and names. Any user can create "
         "it. Only admin can delete it",
     },
+    {
+        "name": "releases",
+        "description": "Releases connect artists and labels. One release has one label and one or more artists."
+        "Only admin can delete it.",
+    },
 ]
 
 
@@ -48,6 +53,7 @@ def create_application() -> FastAPI:
     application.include_router(packs.router, prefix="/packs", tags=["packs"])
     application.include_router(labels.router, prefix="/labels", tags=["labels"])
     application.include_router(artists.router, prefix="/artists", tags=["artists"])
+    application.include_router(releases.router, prefix="/releases", tags=["releases"])
     application.include_router(login.router, tags=["login"])
     application.add_middleware(
         CORSMiddleware,

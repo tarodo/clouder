@@ -1,5 +1,5 @@
-from app.models.beatport.artists import Artist, ReleaseArtist
-from app.models.beatport.labels import Label
+from app.models.beatport.artists import Artist, ArtistOut, ReleaseArtist
+from app.models.beatport.labels import Label, LabelOut
 from pydantic import constr
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -11,11 +11,10 @@ class ReleaseBase(SQLModel):
     name: name_con = Field(index=True, nullable=False)
     url: url_con = Field(nullable=False)
     bp_id: int = Field(index=True, nullable=False, sa_column_kwargs={"unique": True})
-    label_id: int | None = Field(foreign_key="label.id")
 
 
 class ReleaseBaseDB(ReleaseBase):
-    pass
+    label_id: int | None = Field(foreign_key="label.id")
 
 
 class Release(ReleaseBaseDB, table=True):
@@ -31,9 +30,12 @@ class ReleaseInDB(ReleaseBaseDB):
     pass
 
 
-class ReleaseOut(ReleaseBaseDB):
+class ReleaseOut(ReleaseBase):
     id: int = Field(...)
+    label: LabelOut | None
+    artists: list[ArtistOut] | None
 
 
 class ReleaseInApi(ReleaseBase):
     artists_id: list[int] | None
+    label_id: int | None
