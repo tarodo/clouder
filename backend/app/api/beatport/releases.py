@@ -22,7 +22,7 @@ class ReleasesErrors(Enum):
 
 @router.post("/", response_model=ReleaseOut, status_code=200, responses=responses)
 def create_release(
-    payload: ReleaseInApi = Body(examples=create_examples),
+    payload: ReleaseInApi = Body(),
     _: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Release:
