@@ -44,11 +44,9 @@ class PeriodOut(PeriodBaseDB):
     id: int = Field(...)
 
 
-class PeriodUpdate(PeriodBase):
-    name: name_con | None = None
-    first_day: datetime.date | None = None
-    last_day: datetime.date | None = None
-
-
 class PeriodInApi(PeriodBase):
+    pass
+
+
+class PeriodUpdate(PeriodInApi):
     pass

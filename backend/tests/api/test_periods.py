@@ -269,13 +269,7 @@ def test_period_update_none_name(
         client=client, email=random_user.email, db=db
     )
     r = client.put(f"/periods/{old_period.id}/", headers=user_token_headers, json=data)
-    assert 200 <= r.status_code < 300
-    updated_period = r.json()
-    assert updated_period["id"] == old_period.id
-    assert updated_period["user_id"] == random_user.id
-    assert updated_period["name"] == old_period.name
-    assert updated_period["first_day"] == data["first_day"]
-    assert updated_period["last_day"] == data["last_day"]
+    assert r.status_code == 422
 
 
 def test_period_update_first_gt_last(
@@ -304,7 +298,7 @@ def test_period_update_first_gt_last_first_only(
         client=client, email=random_user.email, db=db
     )
     r = client.put(f"/periods/{old_period.id}/", headers=user_token_headers, json=data)
-    assert r.status_code == 400
+    assert r.status_code == 422
 
 
 def test_period_update_first_only(
@@ -321,13 +315,7 @@ def test_period_update_first_only(
         client=client, email=random_user.email, db=db
     )
     r = client.put(f"/periods/{old_period.id}/", headers=user_token_headers, json=data)
-    assert 200 <= r.status_code < 300
-    updated_period = r.json()
-    assert updated_period["id"] == old_period.id
-    assert updated_period["user_id"] == random_user.id
-    assert updated_period["name"] == old_period.name
-    assert updated_period["first_day"] == data["first_day"]
-    assert updated_period["last_day"] == old_period.last_day.strftime("%Y-%m-%d")
+    assert r.status_code == 422
 
 
 def test_period_update_wrong_id(
