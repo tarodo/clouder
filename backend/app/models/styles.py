@@ -33,10 +33,9 @@ class StyleOut(StyleBaseDB):
     id: int = Field(...)
 
 
-class StyleUpdate(SQLModel):
-    name: name_con | None = None
-    base_link: link_con | None = None
-
-
 class StyleInApi(StyleBase):
+    pass
+
+
+class StyleUpdate(StyleBase):
     pass

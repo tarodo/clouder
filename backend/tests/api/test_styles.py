@@ -206,12 +206,7 @@ def test_style_update_none_name(
         client=client, email=random_user.email, db=db
     )
     r = client.put(f"/styles/{old_style.id}/", headers=user_token_headers, json=data)
-    assert 200 <= r.status_code < 300
-    updated_style = r.json()
-    assert updated_style["id"] == old_style.id
-    assert updated_style["name"]
-    assert updated_style["name"] == old_style.name
-    assert updated_style["base_link"] == data["base_link"]
+    assert r.status_code == 422
 
 
 def test_style_update_none_link(
@@ -223,12 +218,7 @@ def test_style_update_none_link(
         client=client, email=random_user.email, db=db
     )
     r = client.put(f"/styles/{old_style.id}/", headers=user_token_headers, json=data)
-    assert 200 <= r.status_code < 300
-    updated_style = r.json()
-    assert updated_style["id"] == old_style.id
-    assert updated_style["base_link"]
-    assert updated_style["base_link"] == old_style.base_link
-    assert updated_style["name"] == data["name"]
+    assert r.status_code == 422
 
 
 def test_style_update_wrong_id(
