@@ -16,7 +16,7 @@ class ReleasesErrors(Enum):
     ReleaseAlreadyExists = "Release already exists"
     ReleaseDoesNotExist = "Release does not exist"
     UserHasNoRights = "User has no rights"
-    ArtistDoesNotExists = "Artist does not exist"
+    ArtistDoesNotExists = "Artist ID :{}: does not exist"
     LabelDoesNotExists = "Label ID :{}: does not exist"
 
 
@@ -37,7 +37,7 @@ def create_release(
         for art_id in payload.artists_id:
             art_db = artists.read_by_id(db, art_id)
             if not art_db:
-                raise_400(ReleasesErrors.ArtistDoesNotExists)
+                raise_400(ReleasesErrors.ArtistDoesNotExists, art_id)
             q_artists.append(art_db)
     release_in = ReleaseInDB(**payload.dict())
     return releases.create(db, release_in, q_artists)

@@ -59,3 +59,47 @@ def test_release_create_wrong_label(
     assert new_release["detail"]["msg"] == str(
         ReleasesErrors.LabelDoesNotExists.value.format(wrong_label_id)
     )
+
+
+def test_release_create_wrong_artist(
+    client: TestClient, db: Session, user_token_headers
+) -> None:
+    one_label = create_random_label(db)
+    one_artist = create_random_artist(db)
+    wrong_artist_ids = [one_artist.id + 100, one_artist.id + 101]
+    data = {
+        "name": "Exploited",
+        "url": "https://www.beatport.com/release/exploited/7600",
+        "bp_id": random_bp_id(),
+        "label_id": one_label.id,
+        "artists_id": wrong_artist_ids,
+    }
+    r = client.post(f"/releases/", headers=user_token_headers, json=data)
+    assert r.status_code == 400
+    new_release = r.json()
+    assert new_release["detail"]["type"] == str(ReleasesErrors.ArtistDoesNotExists)
+    assert new_release["detail"]["msg"] == str(
+        ReleasesErrors.ArtistDoesNotExists.value.format(wrong_artist_ids[0])
+    )
+
+
+def test_release_create_wrong_second_artist(
+    client: TestClient, db: Session, user_token_headers
+) -> None:
+    one_label = create_random_label(db)
+    one_artist = create_random_artist(db)
+    wrong_artist_ids = [one_artist.id, one_artist.id + 101]
+    data = {
+        "name": "Exploited",
+        "url": "https://www.beatport.com/release/exploited/7600",
+        "bp_id": random_bp_id(),
+        "label_id": one_label.id,
+        "artists_id": wrong_artist_ids,
+    }
+    r = client.post(f"/releases/", headers=user_token_headers, json=data)
+    assert r.status_code == 400
+    new_release = r.json()
+    assert new_release["detail"]["type"] == str(ReleasesErrors.ArtistDoesNotExists)
+    assert new_release["detail"]["msg"] == str(
+        ReleasesErrors.ArtistDoesNotExists.value.format(wrong_artist_ids[1])
+    )
