@@ -37,3 +37,25 @@ def test_release_create(client: TestClient, db: Session, user_token_headers) -> 
     assert release.label_id == data["label_id"]
     artists_id = set(art.id for art in release.artists)
     assert artists_id == set(data["artists_id"])
+
+
+def test_release_create_wrong_label(
+    client: TestClient, db: Session, user_token_headers
+) -> None:
+    one_label = create_random_label(db)
+    wrong_label_id = one_label.id + 100
+    release_artists = [create_random_artist(db) for _ in range(3)]
+    data = {
+        "name": "Exploited",
+        "url": "https://www.beatport.com/release/exploited/7600",
+        "bp_id": random_bp_id(),
+        "label_id": wrong_label_id,
+        "artists_id": [art.id for art in release_artists],
+    }
+    r = client.post(f"/releases/", headers=user_token_headers, json=data)
+    assert r.status_code == 400
+    new_release = r.json()
+    assert new_release["detail"]["type"] == str(ReleasesErrors.LabelDoesNotExists)
+    assert new_release["detail"]["msg"] == str(
+        ReleasesErrors.LabelDoesNotExists.value.format(wrong_label_id)
+    )

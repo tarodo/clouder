@@ -17,7 +17,7 @@ class ReleasesErrors(Enum):
     ReleaseDoesNotExist = "Release does not exist"
     UserHasNoRights = "User has no rights"
     ArtistDoesNotExists = "Artist does not exist"
-    LabelDoesNotExists = "Label does not exist"
+    LabelDoesNotExists = "Label ID :{}: does not exist"
 
 
 @router.post("/", response_model=ReleaseOut, status_code=200, responses=responses)
@@ -30,7 +30,7 @@ def create_release(
     if payload.label_id:
         q_label = labels.read_by_id(db, payload.label_id)
         if not q_label:
-            raise_400(ReleasesErrors.LabelDoesNotExists)
+            raise_400(ReleasesErrors.LabelDoesNotExists, payload.label_id)
 
     q_artists = []
     if payload.artists_id:
@@ -76,6 +76,18 @@ def read_many(
     db: Session = Depends(deps.get_db),
 ) -> list[Release] | None:
     """Retrieve one release by Label ID"""
+    pass
+
+
+@router.get(
+    "/findByArtistId", response_model=ReleaseOut, status_code=200, responses=responses
+)
+def read_many(
+    artist_id: int | None = Query(None, ge=1),
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db),
+) -> list[Release] | None:
+    """Retrieve one release by Artist ID"""
     pass
 
 
