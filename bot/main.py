@@ -10,6 +10,7 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 def get_release_info(release_url) -> dict:
@@ -22,7 +23,8 @@ async def show_release(
     release_url, update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
     release = get_release_info(release_url)
-    version = release["name"]
+    logger.error(f"{release=}")
+    version = release[0]["name"]
     await update.message.reply_text(f"Актуальный релиз :: {version}")
 
 
