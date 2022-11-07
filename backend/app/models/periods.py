@@ -9,7 +9,7 @@ name_con = constr(min_length=1, max_length=127)
 
 
 class PeriodBase(SQLModel):
-    name: name_con = Field(index=True, sa_column_kwargs={"unique": True})
+    name: name_con = Field(index=True)
     first_day: datetime.date = Field(...)
     last_day: datetime.date = Field(...)
 
