@@ -109,7 +109,10 @@ def test_release_read_by_label_id(
     client: TestClient, db: Session, user_token_headers
 ) -> None:
     one_label = create_random_label(db)
-    control_releases = [create_random_release(db, label=one_label) for _ in range(3)]
+    releases_cnt = 3
+    control_releases = [
+        create_random_release(db, label=one_label) for _ in range(releases_cnt)
+    ]
     control_ids = [control_release.id for control_release in control_releases]
     params = {"label_id": one_label.id}
     r = client.get(
@@ -117,4 +120,25 @@ def test_release_read_by_label_id(
     )
     assert 200 <= r.status_code < 300
     read_releases = r.json()
+    assert len(read_releases) == releases_cnt
+    assert all([one_release["id"] in control_ids for one_release in read_releases])
+
+
+def test_release_read_by_artist_id(
+    client: TestClient, db: Session, user_token_headers
+) -> None:
+    one_artist = create_random_artist(db)
+    releases_cnt = 3
+    control_releases = [
+        create_random_release(db, release_artists=[one_artist])
+        for _ in range(releases_cnt)
+    ]
+    control_ids = [control_release.id for control_release in control_releases]
+    params = {"artist_id": one_artist.id}
+    r = client.get(
+        f"/releases/findByArtistId", params=params, headers=user_token_headers
+    )
+    assert 200 <= r.status_code < 300
+    read_releases = r.json()
+    assert len(read_releases) == releases_cnt
     assert all([one_release["id"] in control_ids for one_release in read_releases])

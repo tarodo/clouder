@@ -78,24 +78,31 @@ def read_many_by_label(
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> list[Release] | None:
-    """Retrieve one release by Label ID"""
+    """Retrieve all releases by Label ID"""
     q_label = labels.read_by_id(db, label_id)
     if not q_label:
         raise_400(ReleasesErrors.LabelDoesNotExists, label_id)
-    q_releases = releases.read_by_label_id(db, label_id)
+    q_releases = releases.read_by_label_id(db, q_label)
     return q_releases
 
 
 @router.get(
-    "/findByArtistId", response_model=ReleaseOut, status_code=200, responses=responses
+    "/findByArtistId",
+    response_model=list[ReleaseOut],
+    status_code=200,
+    responses=responses,
 )
 def read_many(
     artist_id: int | None = Query(None, ge=1),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> list[Release] | None:
-    """Retrieve one release by Artist ID"""
-    pass
+    """Retrieve all releases by Artist ID"""
+    q_artist = artists.read_by_id(db, artist_id)
+    if not q_artist:
+        raise_400(ReleasesErrors.ArtistDoesNotExists, artist_id)
+    q_releases = releases.read_by_artist(db, q_artist)
+    return q_releases
 
 
 @router.get(

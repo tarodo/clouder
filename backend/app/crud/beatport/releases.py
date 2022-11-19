@@ -1,5 +1,5 @@
 from app.crud import common
-from app.models import Artist, Release, ReleaseInDB
+from app.models import Artist, Label, Release, ReleaseInDB
 from sqlmodel import Session
 
 
@@ -15,10 +15,14 @@ def read_by_bp_id(db: Session, bp_id: int) -> Release | None:
     return release
 
 
-def read_by_label_id(db: Session, label_id: int) -> list[Release] | None:
-    """Read release by label id"""
-    release = common.read_by_field_many(db, Release.label_id, label_id)
-    return release
+def read_by_label_id(db: Session, label: Label) -> list[Release] | None:
+    """Read releases by label id"""
+    return label.releases
+
+
+def read_by_artist(db: Session, artist: Artist) -> list[Release] | None:
+    """Read releases by artist id"""
+    return artist.releases
 
 
 def read_by_id(db: Session, release_id: int) -> Release | None:
