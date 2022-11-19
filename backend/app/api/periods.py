@@ -5,7 +5,7 @@ from app.api.tools import raise_400
 from app.crud import periods
 from app.models import (Period, PeriodInApi, PeriodInDB, PeriodOut,
                         PeriodUpdate, User, responses)
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, Path
 from pydantic import ValidationError
 from sqlmodel import Session
 
@@ -138,7 +138,7 @@ def read_my(
     "/{period_id}/", response_model=PeriodOut, status_code=200, responses=responses
 )
 def read(
-    period_id: int,
+    period_id: int = Path(..., gt=0),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Period | None:
@@ -157,7 +157,7 @@ def read(
     "/{period_id}/", response_model=PeriodOut, status_code=200, responses=responses
 )
 def update(
-    period_id: int,
+    period_id: int = Path(..., gt=0),
     payload: PeriodUpdate = Body(examples=update_example),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
@@ -199,7 +199,7 @@ def update(
     "/{period_id}/", response_model=PeriodOut, status_code=200, responses=responses
 )
 def remove(
-    period_id: int,
+    period_id: int = Path(..., gt=0),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Period | None:

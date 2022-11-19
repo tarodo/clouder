@@ -65,6 +65,8 @@ def test_period_update_name(db, random_user) -> None:
     old_version = period.dict()
     period_update_in = PeriodUpdate(
         name=random_lower_string(8),
+        first_day=period.first_day,
+        last_day=period.last_day,
     )
     period_updated = periods.update(db, period, period_update_in)
     assert period_updated == period
@@ -78,7 +80,9 @@ def test_period_update_first_day(db, random_user) -> None:
     period = create_random_period(db, random_user)
     old_version = period.dict()
     period_update_in = PeriodUpdate(
+        name=period.name,
         first_day=period.first_day - datetime.timedelta(days=1),
+        last_day=period.last_day,
     )
     period_updated = periods.update(db, period, period_update_in)
     assert period_updated == period
@@ -92,6 +96,8 @@ def test_period_update_last_day(db, random_user) -> None:
     period = create_random_period(db, random_user)
     old_version = period.dict()
     period_update_in = PeriodUpdate(
+        name=period.name,
+        first_day=period.first_day,
         last_day=period.last_day + datetime.timedelta(days=1),
     )
     period_updated = periods.update(db, period, period_update_in)

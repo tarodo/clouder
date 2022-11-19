@@ -32,7 +32,9 @@ def test_style_read_by_name(db: Session, random_user: User) -> None:
 def test_style_update_name(db, random_user) -> None:
     style = create_random_style(db, random_user)
     old_name = style.name
-    style_update_in = StyleUpdate(name=random_lower_string(8))
+    style_update_in = StyleUpdate(
+        name=random_lower_string(8), base_link=style.base_link
+    )
     style_updated = styles.update(db, style, style_update_in)
     assert style_updated == style
     assert style_updated.name == style_update_in.name
@@ -42,7 +44,7 @@ def test_style_update_name(db, random_user) -> None:
 def test_style_update_base_link(db, random_user) -> None:
     style = create_random_style(db, random_user)
     old_base_link = style.base_link
-    style_update_in = StyleUpdate(base_link=random_lower_string(8))
+    style_update_in = StyleUpdate(name=style.name, base_link=random_lower_string(8))
     style_updated = styles.update(db, style, style_update_in)
     assert style_updated == style
     assert style_updated.base_link == style_update_in.base_link

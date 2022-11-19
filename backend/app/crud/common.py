@@ -1,4 +1,5 @@
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy.orm import InstrumentedAttribute
 from sqlmodel import Session, SQLModel, select
 
 
@@ -6,6 +7,22 @@ def read_by_id(db: Session, Model, elem_id: int) -> SQLModel | None:
     """Read one element by id"""
     elem = select(Model).where(Model.id == elem_id)
     elem = db.exec(elem).one_or_none()
+    return elem
+
+
+def read_by_field(db: Session, Field: InstrumentedAttribute, value) -> SQLModel | None:
+    """Read element by field value"""
+    elem = select(Field.class_).where(Field == value)
+    elem = db.exec(elem).one_or_none()
+    return elem
+
+
+def read_by_field_many(
+    db: Session, Field: InstrumentedAttribute, value
+) -> list[SQLModel] | None:
+    """Read elements by field value"""
+    elem = select(Field.class_).where(Field == value)
+    elem = db.exec(elem).all()
     return elem
 
 

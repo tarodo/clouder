@@ -1,12 +1,10 @@
-import logging
 from enum import Enum
 
 from app.api import deps
 from app.api.tools import raise_400
 from app.crud import packs, periods, styles
 from app.models import Pack, PackInApi, PackInDB, PackOut, User, responses
-from fastapi import APIRouter, Body, Depends, Query
-from pydantic import ValidationError
+from fastapi import APIRouter, Depends, Path, Query
 from sqlmodel import Session
 
 router = APIRouter()
@@ -102,7 +100,7 @@ def read_many(
 
 @router.get("/{pack_id}/", response_model=PackOut, status_code=200, responses=responses)
 def read(
-    pack_id: int,
+    pack_id: int = Path(..., gt=0),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Pack | None:
@@ -121,7 +119,7 @@ def read(
     "/{pack_id}/", response_model=PackOut, status_code=200, responses=responses
 )
 def remove(
-    pack_id: int,
+    pack_id: int = Path(..., gt=0),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Pack | None:

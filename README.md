@@ -20,13 +20,23 @@ You need to create `.env` file in './db' directory:
 1. POSTGRES_USER - default user
 2. POSTGRES_PASSWORD - pass of the user
 
+You need to create `.env` file in './bot' directory:
+1. BOT_TOKEN - str, token from [BotFather](https://t.me/botfather)
+2. RELEASE_URL - str, github url about the last release, e.g. `https://api.github.com/repos/tarodo/clouder/releases/latest`
+
+
 ## Start
 ### Start in Docker-compose
-1. `docker-compose up`
+1. `docker-compose up --build`
 
 ### Start test
 1. `docker-compose exec back python -m pytest --cov app`
 
+## Contribute
+### Schemas changes
+1. `docker-compose exec back alembic revision --autogenerate -m "msg"`
+2. `docker-compose exec back alembic upgrade head`
+
 ### Before commit
-1. `black .\beatport.py .\models.py .\spotify.py .\backend\app\api\ .\backend\app\core\ .\backend\app\crud\ .\backend\app\models\ .\backend\tests\`
-2. `isort .\beatport.py .\models.py .\spotify.py .\backend\app\api\ .\backend\app\core\ .\backend\app\crud\ .\backend\app\models\ .\backend\tests\`
+1. `black .\beatport.py .\models.py .\spotify.py .\backend\app\api\ .\backend\app\core\ .\backend\app\crud\ .\backend\app\models\ .\backend\tests\ .\bot`
+2. `isort .\beatport.py .\models.py .\spotify.py .\backend\app\api\ .\backend\app\core\ .\backend\app\crud\ .\backend\app\models\ .\backend\tests\ .\bot`

@@ -18,3 +18,7 @@ def random_date(start_date: int = 1, end_date: int = None) -> datetime:
         end_date = int(time.time())
     new_date = random.randint(start_date, end_date)
     return datetime.fromtimestamp(new_date)
+
+
+def random_bp_id() -> int:
+    return random.randrange(3000000, 4000000)

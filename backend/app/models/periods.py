@@ -5,11 +5,11 @@ from pydantic import constr, root_validator
 from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
-name_con = constr(min_length=1)
+name_con = constr(min_length=1, max_length=127)
 
 
 class PeriodBase(SQLModel):
-    name: name_con = Field(index=True, sa_column_kwargs={"unique": True})
+    name: name_con = Field(index=True)
     first_day: datetime.date = Field(...)
     last_day: datetime.date = Field(...)
 
@@ -44,11 +44,9 @@ class PeriodOut(PeriodBaseDB):
     id: int = Field(...)
 
 
-class PeriodUpdate(PeriodBase):
-    name: name_con | None = None
-    first_day: datetime.date | None = None
-    last_day: datetime.date | None = None
-
-
 class PeriodInApi(PeriodBase):
+    pass
+
+
+class PeriodUpdate(PeriodInApi):
     pass

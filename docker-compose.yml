@@ -24,3 +24,10 @@ services:
       dockerfile: Dockerfile
     env_file:
       - ./db/.env
+
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    env_file:
+      - ./bot/.env

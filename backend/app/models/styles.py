@@ -4,7 +4,7 @@ from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
 # TODO: Change vars to enums
-name_con = constr(min_length=1)
+name_con = constr(min_length=1, max_length=127)
 link_con = constr(min_length=1)
 
 
@@ -33,10 +33,9 @@ class StyleOut(StyleBaseDB):
     id: int = Field(...)
 
 
-class StyleUpdate(SQLModel):
-    name: name_con | None = None
-    base_link: link_con | None = None
-
-
 class StyleInApi(StyleBase):
+    pass
+
+
+class StyleUpdate(StyleBase):
     pass

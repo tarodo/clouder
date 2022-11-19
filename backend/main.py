@@ -1,19 +1,59 @@
 import uvicorn
+from app.api import login, packs, periods, styles, users
+from app.api.beatport import artists, labels, releases
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import login, users, styles, periods, packs
+tags_metadata = [
+    {
+        "name": "users",
+        "description": "Only admin can create users. User can get information about itself. The user's email is unique",
+    },
+    {
+        "name": "styles",
+        "description": "The user can only work with its own styles. The user cannot see or change the styles of other "
+        "users. The user can get all of its styles. The style's name is unique",
+    },
+    {
+        "name": "periods",
+        "description": "The user can only work with its own periods. The user cannot see or change the periods of "
+        "other users. The user can get all of its periods. Period can start and finish in one day, "
+        "but couldn't start after the last day. The period's name is unique",
+    },
+    {
+        "name": "packs",
+        "description": "Pack is the connector between the style and the period. The user can only work with their own "
+        "styles and periods. You cannot create a pack with the same style and period id",
+    },
+    {
+        "name": "labels",
+        "description": "Labels are for saving beatport label's information, their IDs and names. Any user can create "
+        "it. Only admin can delete it",
+    },
+    {
+        "name": "artists",
+        "description": "Artists are for saving beatport artist's information, their IDs and names. Any user can create "
+        "it. Only admin can delete it",
+    },
+    {
+        "name": "releases",
+        "description": "Releases connect artists and labels. One release has one label and one or more artists."
+        "Only admin can delete it.",
+    },
+]
 
 
 def create_application() -> FastAPI:
     application = FastAPI(
-        title="cLoudER Space",
-        version="0.3.2"
+        title="cLoudER Space", version="0.3.4", openapi_tags=tags_metadata
     )
     application.include_router(users.router, prefix="/users", tags=["users"])
     application.include_router(styles.router, prefix="/styles", tags=["styles"])
     application.include_router(periods.router, prefix="/periods", tags=["periods"])
     application.include_router(packs.router, prefix="/packs", tags=["packs"])
+    application.include_router(labels.router, prefix="/labels", tags=["labels"])
+    application.include_router(artists.router, prefix="/artists", tags=["artists"])
+    application.include_router(releases.router, prefix="/releases", tags=["releases"])
     application.include_router(login.router, tags=["login"])
     application.add_middleware(
         CORSMiddleware,

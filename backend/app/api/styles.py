@@ -5,7 +5,7 @@ from app.api.tools import raise_400
 from app.crud import styles
 from app.models import (Style, StyleInApi, StyleInDB, StyleOut, StyleUpdate,
                         User, responses)
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, Path
 from sqlmodel import Session
 
 router = APIRouter()
@@ -92,7 +92,7 @@ def read_my(
     "/{style_id}/", response_model=StyleOut, status_code=200, responses=responses
 )
 def read(
-    style_id: int,
+    style_id: int = Path(..., gt=0),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Style | None:
@@ -111,8 +111,8 @@ def read(
     "/{style_id}/", response_model=StyleOut, status_code=200, responses=responses
 )
 def update(
-    style_id: int,
-    payload: StyleUpdate,
+    style_id: int = Path(..., gt=0),
+    payload: StyleUpdate = Body(...),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Style | None:
@@ -135,7 +135,7 @@ def update(
     "/{style_id}/", response_model=StyleOut, status_code=200, responses=responses
 )
 def remove(
-    style_id: int,
+    style_id: int = Path(..., gt=0),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> Style | None:
