@@ -38,5 +38,5 @@ You need to create `.env` file in './bot' directory:
 2. `docker-compose exec back alembic upgrade head`
 
 ### Before commit
-1. `black .\beatport.py .\models.py .\spotify.py .\backend\app\api\ .\backend\app\core\ .\backend\app\crud\ .\backend\app\models\ .\backend\tests\ .\bot\`
-2. `isort .\beatport.py .\models.py .\spotify.py .\backend\app\api\ .\backend\app\core\ .\backend\app\crud\ .\backend\app\models\ .\backend\tests\ .\bot\`
+1. `black .\beatport.py .\models.py .\spotify.py .\backend\app\api\ .\backend\app\core\ .\backend\app\crud\ .\backend\app\models\ .\backend\tests\ .\bot`
+2. `isort .\beatport.py .\models.py .\spotify.py .\backend\app\api\ .\backend\app\core\ .\backend\app\crud\ .\backend\app\models\ .\backend\tests\ .\bot`

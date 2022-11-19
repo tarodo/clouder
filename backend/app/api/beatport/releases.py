@@ -46,7 +46,7 @@ def create_release(
 @router.get(
     "/findByName", response_model=list[ReleaseOut], status_code=200, responses=responses
 )
-def read_many(
+def read_many_by_name(
     name: name_con = Query(...),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
@@ -58,7 +58,7 @@ def read_many(
 @router.get(
     "/findByBpId", response_model=ReleaseOut, status_code=200, responses=responses
 )
-def read_many(
+def read_many_by_bp_id(
     bp_id: int | None = Query(None, ge=1),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
@@ -68,15 +68,22 @@ def read_many(
 
 
 @router.get(
-    "/findByLabelId", response_model=ReleaseOut, status_code=200, responses=responses
+    "/findByLabelId",
+    response_model=list[ReleaseOut],
+    status_code=200,
+    responses=responses,
 )
-def read_many(
+def read_many_by_label(
     label_id: int | None = Query(None, ge=1),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> list[Release] | None:
     """Retrieve one release by Label ID"""
-    pass
+    q_label = labels.read_by_id(db, label_id)
+    if not q_label:
+        raise_400(ReleasesErrors.LabelDoesNotExists, label_id)
+    q_releases = releases.read_by_label_id(db, label_id)
+    return q_releases
 
 
 @router.get(

@@ -103,3 +103,18 @@ def test_release_create_wrong_second_artist(
     assert new_release["detail"]["msg"] == str(
         ReleasesErrors.ArtistDoesNotExists.value.format(wrong_artist_ids[1])
     )
+
+
+def test_release_read_by_label_id(
+    client: TestClient, db: Session, user_token_headers
+) -> None:
+    one_label = create_random_label(db)
+    control_releases = [create_random_release(db, label=one_label) for _ in range(3)]
+    control_ids = [control_release.id for control_release in control_releases]
+    params = {"label_id": one_label.id}
+    r = client.get(
+        f"/releases/findByLabelId", params=params, headers=user_token_headers
+    )
+    assert 200 <= r.status_code < 300
+    read_releases = r.json()
+    assert all([one_release["id"] in control_ids for one_release in read_releases])

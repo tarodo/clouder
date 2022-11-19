@@ -15,11 +15,17 @@ def read_by_bp_id(db: Session, bp_id: int) -> Release | None:
     return release
 
 
+def read_by_label_id(db: Session, label_id: int) -> list[Release] | None:
+    """Read release by label id"""
+    release = common.read_by_field_many(db, Release.label_id, label_id)
+    return release
+
+
 def read_by_id(db: Session, release_id: int) -> Release | None:
     return common.read_by_id(db, Release, release_id)
 
 
-def add_artist(db: Session, release: Release, artists: list[Artist]) -> Release:
+def add_artists(db: Session, release: Release, artists: list[Artist]) -> Release:
     for art in artists:
         release.artists.append(art)
     db.add(release)
@@ -31,7 +37,7 @@ def add_artist(db: Session, release: Release, artists: list[Artist]) -> Release:
 def create(db: Session, payload: ReleaseInDB, artists: list[Artist] | None) -> Release:
     one_release = common.create(db, Release, payload)
     if artists:
-        one_release = add_artist(db, one_release, artists)
+        one_release = add_artists(db, one_release, artists)
     return one_release
 
 

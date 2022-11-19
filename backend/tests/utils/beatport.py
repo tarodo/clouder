@@ -40,10 +40,16 @@ def create_random_release(
     name: str | None = None,
     url: str | None = None,
     bp_id: int | None = None,
+    label: Label | None = None,
+    release_artists: list[Artist] | None = None,
 ) -> Release:
     """Create random release"""
-    label = create_random_label(db)
-    release_artists = [create_random_artist(db) for _ in range(3)]
+    label = label if label else create_random_label(db)
+    release_artists = (
+        release_artists
+        if release_artists
+        else [create_random_artist(db) for _ in range(3)]
+    )
     release_in = ReleaseInDB(
         name=name if name else random_lower_string(8),
         url=url if url else random_lower_string(8),
