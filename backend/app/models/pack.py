@@ -31,6 +31,7 @@ class PackInDB(PackBaseDB):
 
 class PackOut(PackBaseDB):
     id: int = Field(...)
+    releases: list[Release] = Field(default=[])
 
 
 class PackInApi(PackBase):

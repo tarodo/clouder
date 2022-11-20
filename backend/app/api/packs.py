@@ -1,8 +1,10 @@
 from enum import Enum
 
 from app.api import deps
+from app.api.beatport.releases import ReleasesErrors
 from app.api.tools import raise_400
 from app.crud import packs, periods, styles
+from app.crud.beatport import releases
 from app.models import Pack, PackInApi, PackInDB, PackOut, User, responses
 from fastapi import APIRouter, Depends, Path, Query
 from sqlmodel import Session
@@ -64,6 +66,12 @@ def check_to_remove(user: User, one_pack: Pack) -> bool:
     return check_to_read(user, one_pack)
 
 
+def create_pack_out(q_pack: Pack) -> PackOut:
+    """Collect releases for a pack"""
+    pack_releases = [pr.release for pr in q_pack.pack_releases]
+    return PackOut(**q_pack.dict(), releases=pack_releases)
+
+
 @router.post("/", response_model=PackOut, status_code=200, responses=responses)
 def create_pack(
     payload: PackInApi,
@@ -87,7 +95,7 @@ def read_many(
     period_id: int | None = Query(None, ge=1),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
-) -> list[Pack] | None:
+) -> list[PackOut] | None:
     """Retrieve all packs for style and period"""
     if not style_id and not period_id:
         raise_400(PacksErrors.NotEnoughParams)
@@ -95,7 +103,8 @@ def read_many(
         if not check_to_read_by_style_period(db, current_user, style_id, period_id):
             raise_400(PacksErrors.UserHasNoAccess, current_user.id)
     query_packs = packs.read_packs(db, style_id, period_id)
-    return query_packs
+    packs_out = [create_pack_out(one_pack) for one_pack in query_packs]
+    return packs_out
 
 
 @router.get("/{pack_id}/", response_model=PackOut, status_code=200, responses=responses)
@@ -103,12 +112,12 @@ def read(
     pack_id: int = Path(..., gt=0),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
-) -> Pack | None:
+) -> PackOut | None:
     """Retrieve a pack by id"""
     one_pack = packs.read_by_id(db, pack_id)
     if one_pack:
         if check_to_read(current_user, one_pack):
-            return one_pack
+            return create_pack_out(one_pack)
     else:
         if current_user.is_admin:
             return raise_400(PacksErrors.PackDoesNotExist, pack_id)
@@ -133,3 +142,33 @@ def remove(
         return raise_400(PacksErrors.UserHasNoRights, current_user.id)
 
     return packs.remove(db, one_pack)
+
+
+@router.post(
+    "/{pack_id}/releases/{release_id}",
+    response_model=PackOut,
+    status_code=200,
+    responses=responses,
+)
+def add_release(
+    pack_id: int = Path(..., gt=0),
+    release_id: int = Path(..., gt=0),
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db),
+) -> PackOut | None:
+    """Add release to a pack"""
+    one_pack = packs.read_by_id(db, pack_id)
+    if not one_pack:
+        if current_user.is_admin:
+            return raise_400(PacksErrors.PackDoesNotExist, pack_id)
+        else:
+            return raise_400(PacksErrors.UserHasNoAccess, current_user.id)
+    if not check_to_read(current_user, one_pack):
+        return raise_400(PacksErrors.UserHasNoAccess, current_user.id)
+
+    one_release = releases.read_by_id(db, release_id)
+    if not one_release:
+        raise_400(ReleasesErrors.ReleaseDoesNotExist, release_id)
+
+    new_pack = packs.add_release(db, one_pack, one_release)
+    return create_pack_out(new_pack)
