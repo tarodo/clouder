@@ -38,14 +38,14 @@ tags_metadata = [
     {
         "name": "releases",
         "description": "Releases connect artists and labels. One release has one label and one or more artists."
-        "Only admin can delete it.",
+        "Only admin can delete it. Field 'bp_id' is unique.",
     },
 ]
 
 
 def create_application() -> FastAPI:
     application = FastAPI(
-        title="cLoudER Space", version="0.3.4", openapi_tags=tags_metadata
+        title="cLoudER Space", version="0.3.5", openapi_tags=tags_metadata
     )
     application.include_router(users.router, prefix="/users", tags=["users"])
     application.include_router(styles.router, prefix="/styles", tags=["styles"])

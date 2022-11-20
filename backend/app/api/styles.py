@@ -12,10 +12,10 @@ router = APIRouter()
 
 
 class StylesErrors(Enum):
-    UserHasNoAccess = "User has no access"
-    UserHasNoRights = "User has no rights"
-    StyleDoesNotExist = "Style does not exist"
-    StyleAlreadyExists = "Style already exists"
+    UserHasNoAccess = "User ID :{}: has no access"
+    UserHasNoRights = "User ID :{}: has no rights"
+    StyleDoesNotExist = "Style ID :{}: does not exist"
+    StyleAlreadyExists = "Style with Name :{}: already exists"
 
 
 def check_to_read(user: User, one_style: Style) -> bool:
@@ -72,7 +72,7 @@ def create_style(
     """Create one style"""
     old_style = styles.read_by_name(db, current_user.id, payload.name)
     if old_style:
-        raise_400(StylesErrors.StyleAlreadyExists)
+        raise_400(StylesErrors.StyleAlreadyExists, payload.name)
     style_in = StyleInDB(**payload.dict(), user_id=current_user.id)
     style = styles.create(db, style_in)
     return style
@@ -103,8 +103,8 @@ def read(
             return one_style
     else:
         if current_user.is_admin:
-            return raise_400(StylesErrors.StyleDoesNotExist)
-    return raise_400(StylesErrors.UserHasNoAccess)
+            return raise_400(StylesErrors.StyleDoesNotExist, style_id)
+    return raise_400(StylesErrors.UserHasNoAccess, current_user.id)
 
 
 @router.put(
@@ -120,13 +120,13 @@ def update(
     one_style = styles.read_by_id(db, style_id)
     if not one_style:
         if current_user.is_admin:
-            return raise_400(StylesErrors.StyleDoesNotExist)
-        return raise_400(StylesErrors.UserHasNoAccess)
+            return raise_400(StylesErrors.StyleDoesNotExist, style_id)
+        return raise_400(StylesErrors.UserHasNoAccess, current_user.id)
     if payload.name:
         if styles.read_by_name(db, current_user.id, payload.name):
-            raise_400(StylesErrors.StyleAlreadyExists)
+            raise_400(StylesErrors.StyleAlreadyExists, payload.name)
     if not check_to_update(current_user, one_style):
-        return raise_400(StylesErrors.UserHasNoAccess)
+        return raise_400(StylesErrors.UserHasNoAccess, current_user.id)
 
     return styles.update(db, one_style, payload)
 
@@ -143,9 +143,9 @@ def remove(
     one_style = styles.read_by_id(db, style_id)
     if not one_style:
         if current_user.is_admin:
-            return raise_400(StylesErrors.StyleDoesNotExist)
-        return raise_400(StylesErrors.UserHasNoAccess)
+            return raise_400(StylesErrors.StyleDoesNotExist, style_id)
+        return raise_400(StylesErrors.UserHasNoAccess, current_user.id)
     if not check_to_remove(current_user, one_style):
-        return raise_400(StylesErrors.UserHasNoRights)
+        return raise_400(StylesErrors.UserHasNoRights, current_user.id)
 
     return styles.remove(db, one_style)

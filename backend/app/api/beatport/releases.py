@@ -14,8 +14,8 @@ router = APIRouter()
 
 class ReleasesErrors(Enum):
     ReleaseAlreadyExists = "Release already exists"
-    ReleaseDoesNotExist = "Release does not exist"
-    UserHasNoRights = "User has no rights"
+    ReleaseDoesNotExist = "Release ID :{}: does not exist"
+    UserHasNoRights = "User ID :{}: has no rights"
     ArtistDoesNotExists = "Artist ID :{}: does not exist"
     LabelDoesNotExists = "Label ID :{}: does not exist"
 
@@ -116,7 +116,7 @@ def read(
     """Retrieve a release by id"""
     one_release = releases.read_by_id(db, release_id)
     if not one_release:
-        raise_400(ReleasesErrors.ReleaseDoesNotExist)
+        raise_400(ReleasesErrors.ReleaseDoesNotExist, release_id)
     return one_release
 
 
@@ -130,8 +130,8 @@ def remove(
 ) -> Release | None:
     """Remove the release by id. Only admin can delete a release."""
     if not current_user.is_admin:
-        raise_400(ReleasesErrors.UserHasNoRights)
+        raise_400(ReleasesErrors.UserHasNoRights, current_user.id)
     one_release = releases.read_by_id(db, release_id)
     if not one_release:
-        raise_400(ReleasesErrors.ReleaseDoesNotExist)
+        raise_400(ReleasesErrors.ReleaseDoesNotExist, release_id)
     return releases.remove(db, one_release)

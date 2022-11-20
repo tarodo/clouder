@@ -13,9 +13,9 @@ router = APIRouter()
 
 
 class ArtistsErrors(Enum):
-    ArtistAlreadyExists = "Artist already exists"
-    ArtistDoesNotExist = "Artist does not exist"
-    UserHasNoRights = "User has no rights"
+    ArtistAlreadyExists = "Artist BP_ID :{}: already exists"
+    ArtistDoesNotExist = "Artist ID :{}: does not exist"
+    UserHasNoRights = "User ID :{}: has no rights"
 
 
 create_examples = {}
@@ -30,7 +30,7 @@ def create_artist(
     """Create one artist"""
     old_artist = artists.read_by_bp_id(db, payload.bp_id)
     if old_artist:
-        raise_400(ArtistsErrors.ArtistAlreadyExists)
+        raise_400(ArtistsErrors.ArtistAlreadyExists, payload.bp_id)
     artist_in = ArtistInDB(**payload.dict())
     artist = artists.create(db, artist_in)
     return artist
@@ -71,7 +71,7 @@ def read(
     """Retrieve a artist by id"""
     one_artist = artists.read_by_id(db, artist_id)
     if not one_artist:
-        raise_400(ArtistsErrors.ArtistDoesNotExist)
+        raise_400(ArtistsErrors.ArtistDoesNotExist, artist_id)
     return one_artist
 
 
@@ -85,8 +85,8 @@ def remove(
 ) -> Artist | None:
     """Remove the artist by id. Only admin can delete an artist."""
     if not current_user.is_admin:
-        raise_400(ArtistsErrors.UserHasNoRights)
+        raise_400(ArtistsErrors.UserHasNoRights, current_user.id)
     one_artist = artists.read_by_id(db, artist_id)
     if not one_artist:
-        raise_400(ArtistsErrors.ArtistDoesNotExist)
+        raise_400(ArtistsErrors.ArtistDoesNotExist, artist_id)
     return artists.remove(db, one_artist)

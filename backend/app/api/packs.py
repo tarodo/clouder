@@ -11,15 +11,15 @@ router = APIRouter()
 
 
 class PacksErrors(Enum):
-    PackAlreadyExists = "Pack already exists"
-    PackDoesNotExist = "Pack does not exist"
-    UserHasNoRights = "User has no rights"
-    UserHasNoAccess = "User has no access"
-    NotEnoughParams = "Not valid count of query params"
+    PackAlreadyExists = "Pack with Style ID :{}: && Period ID :{}: already exists"
+    PackDoesNotExist = "Pack ID :{}: does not exist"
+    UserHasNoRights = "User ID :{}: has no rights"
+    UserHasNoAccess = "User ID :{}: has no access"
+    NotEnoughParams = "Not valid count of query params. Style ID of Period ID must be in your query params"
 
 
 def check_to_create(db: Session, user: User, one_pack_in: PackInApi) -> bool:
-    """Check if the user has create permission"""
+    """Check if the user has 'create' permission"""
     style = styles.read_by_id(db, one_pack_in.style_id)
     if not style or (style.user is not user):
         return False
@@ -49,7 +49,7 @@ def check_to_read_by_style_period(
 
 
 def check_to_read(user: User, one_pack: Pack) -> bool:
-    """Check if the user has read permission"""
+    """Check if the user has 'read' permission"""
     if user.is_admin:
         return True
     one_style = one_pack.style
@@ -60,7 +60,7 @@ def check_to_read(user: User, one_pack: Pack) -> bool:
 
 
 def check_to_remove(user: User, one_pack: Pack) -> bool:
-    """Check if the user has delete permission"""
+    """Check if the user has 'delete' permission"""
     return check_to_read(user, one_pack)
 
 
@@ -73,9 +73,9 @@ def create_pack(
     """Create one pack"""
     old_pack = packs.read_packs(db, payload.style_id, payload.period_id)
     if old_pack:
-        raise_400(PacksErrors.PackAlreadyExists)
+        raise_400(PacksErrors.PackAlreadyExists, payload.style_id, payload.period_id)
     if not check_to_create(db, current_user, payload):
-        raise_400(PacksErrors.UserHasNoRights)
+        raise_400(PacksErrors.UserHasNoRights, current_user.id)
     pack_in = PackInDB(**payload.dict())
     pack = packs.create(db, pack_in)
     return pack
@@ -93,7 +93,7 @@ def read_many(
         raise_400(PacksErrors.NotEnoughParams)
     if not current_user.is_admin:
         if not check_to_read_by_style_period(db, current_user, style_id, period_id):
-            raise_400(PacksErrors.UserHasNoAccess)
+            raise_400(PacksErrors.UserHasNoAccess, current_user.id)
     query_packs = packs.read_packs(db, style_id, period_id)
     return query_packs
 
@@ -111,8 +111,8 @@ def read(
             return one_pack
     else:
         if current_user.is_admin:
-            return raise_400(PacksErrors.PeriodDoesNotExist)
-    return raise_400(PacksErrors.UserHasNoAccess)
+            return raise_400(PacksErrors.PackDoesNotExist, pack_id)
+    return raise_400(PacksErrors.UserHasNoAccess, current_user.id)
 
 
 @router.delete(
@@ -127,9 +127,9 @@ def remove(
     one_pack = packs.read_by_id(db, pack_id)
     if not one_pack:
         if current_user.is_admin:
-            return raise_400(PacksErrors.PeriodDoesNotExist)
-        return raise_400(PacksErrors.UserHasNoRights)
+            return raise_400(PacksErrors.PackDoesNotExist, pack_id)
+        return raise_400(PacksErrors.UserHasNoRights, current_user.id)
     if not check_to_remove(current_user, one_pack):
-        return raise_400(PacksErrors.UserHasNoRights)
+        return raise_400(PacksErrors.UserHasNoRights, current_user.id)
 
     return packs.remove(db, one_pack)

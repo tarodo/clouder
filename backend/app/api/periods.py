@@ -13,10 +13,10 @@ router = APIRouter()
 
 
 class PeriodsErrors(Enum):
-    UserHasNoAccess = "User has no access"
-    UserHasNoRights = "User has no rights"
-    PeriodDoesNotExist = "Period does not exist"
-    PeriodAlreadyExists = "Period already exists"
+    UserHasNoAccess = "User ID :{}: has no access"
+    UserHasNoRights = "User ID :{}: has no rights"
+    PeriodDoesNotExist = "Period ID :{}: does not exist"
+    PeriodAlreadyExists = "Period with Name :{}: already exists"
     FirstDayMustBeEarlier = "The last day should not be earlier than the first day"
 
 
@@ -118,7 +118,7 @@ def create_period(
     """Create one period"""
     old_period = periods.read_by_name(db, current_user.id, payload.name)
     if old_period:
-        raise_400(PeriodsErrors.PeriodAlreadyExists)
+        raise_400(PeriodsErrors.PeriodAlreadyExists, payload.name)
     period_in = PeriodInDB(**payload.dict(), user_id=current_user.id)
     period = periods.create(db, period_in)
     return period
@@ -149,8 +149,8 @@ def read(
             return one_period
     else:
         if current_user.is_admin:
-            return raise_400(PeriodsErrors.PeriodDoesNotExist)
-    return raise_400(PeriodsErrors.UserHasNoAccess)
+            return raise_400(PeriodsErrors.PeriodDoesNotExist, period_id)
+    return raise_400(PeriodsErrors.UserHasNoAccess, current_user.id)
 
 
 @router.put(
@@ -166,15 +166,15 @@ def update(
     one_period = periods.read_by_id(db, period_id)
     if not one_period:
         if current_user.is_admin:
-            return raise_400(PeriodsErrors.PeriodDoesNotExist)
-        return raise_400(PeriodsErrors.UserHasNoAccess)
+            return raise_400(PeriodsErrors.PeriodDoesNotExist, period_id)
+        return raise_400(PeriodsErrors.UserHasNoAccess, current_user.id)
 
     if not check_to_update(current_user, one_period):
-        return raise_400(PeriodsErrors.UserHasNoAccess)
+        return raise_400(PeriodsErrors.UserHasNoAccess, current_user.id)
 
     if payload.name:
         if periods.read_by_name(db, current_user.id, payload.name):
-            raise_400(PeriodsErrors.PeriodAlreadyExists)
+            raise_400(PeriodsErrors.PeriodAlreadyExists, payload.name)
 
     first_day, last_day = payload.first_day, payload.last_day
     if first_day or last_day:
@@ -207,9 +207,9 @@ def remove(
     one_period = periods.read_by_id(db, period_id)
     if not one_period:
         if current_user.is_admin:
-            return raise_400(PeriodsErrors.PeriodDoesNotExist)
-        return raise_400(PeriodsErrors.UserHasNoRights)
+            return raise_400(PeriodsErrors.PeriodDoesNotExist, period_id)
+        return raise_400(PeriodsErrors.UserHasNoRights, current_user.id)
     if not check_to_remove(current_user, one_period):
-        return raise_400(PeriodsErrors.UserHasNoRights)
+        return raise_400(PeriodsErrors.UserHasNoRights, current_user.id)
 
     return periods.remove(db, one_period)

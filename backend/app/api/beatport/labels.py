@@ -12,9 +12,9 @@ router = APIRouter()
 
 
 class LabelsErrors(Enum):
-    LabelAlreadyExists = "Label already exists"
-    LabelDoesNotExist = "Label does not exist"
-    UserHasNoRights = "User has no rights"
+    LabelAlreadyExists = "Label BP_ID :{}: already exists"
+    LabelDoesNotExist = "Label ID :{}: does not exist"
+    UserHasNoRights = "User ID :{}: has no rights"
 
 
 create_examples = {}
@@ -29,7 +29,7 @@ def create_label(
     """Create one label"""
     old_label = labels.read_by_bp_id(db, payload.bp_id)
     if old_label:
-        raise_400(LabelsErrors.LabelAlreadyExists)
+        raise_400(LabelsErrors.LabelAlreadyExists, payload.bp_id)
     label_in = LabelInDB(**payload.dict())
     label = labels.create(db, label_in)
     return label
@@ -70,7 +70,7 @@ def read(
     """Retrieve a label by id"""
     one_label = labels.read_by_id(db, label_id)
     if not one_label:
-        raise_400(LabelsErrors.LabelDoesNotExist)
+        raise_400(LabelsErrors.LabelDoesNotExist, label_id)
     return one_label
 
 
@@ -84,8 +84,8 @@ def remove(
 ) -> Label | None:
     """Remove the label by id. Only admin can delete a label."""
     if not current_user.is_admin:
-        raise_400(LabelsErrors.UserHasNoRights)
+        raise_400(LabelsErrors.UserHasNoRights, current_user.id)
     one_label = labels.read_by_id(db, label_id)
     if not one_label:
-        raise_400(LabelsErrors.LabelDoesNotExist)
+        raise_400(LabelsErrors.LabelDoesNotExist, label_id)
     return labels.remove(db, one_label)
