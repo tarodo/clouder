@@ -1,3 +1,4 @@
+from app.models import Release
 from app.models.periods import Period
 from app.models.styles import Style
 from sqlalchemy import UniqueConstraint
@@ -31,4 +32,35 @@ class PackOut(PackBaseDB):
 
 
 class PackInApi(PackBase):
+    pass
+
+
+class PackReleaseBase(SQLModel):
+    pack_id: int = Field(foreign_key="pack.id", primary_key=True)
+    release_id: int = Field(foreign_key="release.id", primary_key=True)
+    audited: bool = Field(nullable=False, default=False)
+
+
+class PackReleaseBaseDB(PackReleaseBase):
+    pass
+
+
+class PackRelease(PackReleaseBaseDB, table=True):
+    pack: Pack | None = Relationship(back_populates="pack_releases")
+    release: Release | None = Relationship(back_populates="pack_releases")
+
+
+class PackReleaseInDB(PackReleaseBaseDB):
+    pass
+
+
+class PackReleaseOut(PackReleaseBaseDB):
+    pass
+
+
+class PackReleaseInApi(PackReleaseBase):
+    pass
+
+
+class PackReleaseUpdate(PackReleaseInApi):
     pass
