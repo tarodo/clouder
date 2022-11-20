@@ -22,6 +22,8 @@ class Pack(PackBaseDB, table=True):
     style: Style = Relationship(back_populates="packs")
     period: Period = Relationship(back_populates="packs")
 
+    pack_releases: list["PackRelease"] = Relationship(back_populates="pack")
+
 
 class PackInDB(PackBaseDB):
     pass

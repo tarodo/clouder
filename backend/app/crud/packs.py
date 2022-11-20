@@ -1,5 +1,5 @@
 from app.crud import common
-from app.models import Pack, PackInDB
+from app.models import Pack, PackInDB, PackRelease, PackReleaseInDB, Release
 from sqlmodel import Session, select
 
 
@@ -26,3 +26,28 @@ def create(db: Session, payload: PackInDB) -> Pack:
 
 def remove(db: Session, db_obj: Pack) -> Pack:
     return common.remove(db, db_obj)
+
+
+def add_release(db: Session, pack: Pack, release: Release) -> PackRelease:
+    new_pack_release = PackRelease(pack=pack, release=release, audited=False)
+    db.add(new_pack_release)
+    db.commit()
+    db.refresh(new_pack_release)
+    return new_pack_release
+
+
+def read_pack_release(db: Session, pack: Pack, release: Release) -> PackRelease:
+    pack_release_query = select(PackRelease)
+    pack_release_query = pack_release_query.where(PackRelease.pack == pack).where(
+        PackRelease.release == release
+    )
+    pack_release = db.exec(pack_release_query).one()
+    return pack_release
+
+
+def make_audited(db: Session, pack_release: PackRelease) -> PackRelease:
+    pack_release.audited = True
+    db.add(pack_release)
+    db.commit()
+    db.refresh(pack_release)
+    return pack_release

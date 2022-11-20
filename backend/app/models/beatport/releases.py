@@ -25,6 +25,8 @@ class Release(ReleaseBaseDB, table=True):
         back_populates="releases", link_model=ReleaseArtist
     )
 
+    pack_releases: list["PackRelease"] = Relationship(back_populates="release")
+
 
 class ReleaseInDB(ReleaseBaseDB):
     pass

@@ -1,8 +1,9 @@
 import random
 
 from app.crud import packs
-from app.models import PackInDB, User
+from app.models import PackInDB, PackReleaseInDB, User
 from sqlmodel import Session
+from tests.utils.beatport import create_random_release
 from tests.utils.packs import create_random_pack, create_random_packs
 from tests.utils.periods import create_random_period
 from tests.utils.styles import create_random_style
@@ -41,3 +42,34 @@ def test_pack_read_by_period(db: Session, random_user: User) -> None:
     test_packs = packs.read_packs(db, period_id=control_period)
     assert test_packs
     assert all(pack in user_packs for pack in test_packs)
+
+
+def test_pack_release_create(db: Session, random_user: User) -> None:
+    pack = create_random_pack(db, random_user)
+    release = create_random_release(db)
+    pack_release = packs.add_release(db, pack, release)
+    assert pack_release
+    assert pack_release.release == release
+    assert pack_release.pack == pack
+    assert not pack_release.audited
+
+
+def test_pack_release_read(db: Session, random_user: User) -> None:
+    pack = create_random_pack(db, random_user)
+    release = create_random_release(db)
+    pack_release_control = packs.add_release(db, pack, release)
+    assert pack_release_control
+    pack_release = packs.read_pack_release(db, pack, release)
+    assert pack_release
+    assert pack_release == pack_release_control
+
+
+def test_pack_release_make_audited(db: Session, random_user: User) -> None:
+    pack = create_random_pack(db, random_user)
+    release = create_random_release(db)
+    pack_release = packs.add_release(db, pack, release)
+    assert pack_release
+    assert not pack_release.audited
+    pack_release = packs.make_audited(db, pack_release)
+    assert pack_release
+    assert pack_release.audited
