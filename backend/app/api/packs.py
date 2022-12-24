@@ -156,7 +156,7 @@ def add_release(
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
 ) -> PackOut | None:
-    """Add release to a pack"""
+    """Add one release to a pack"""
     one_pack = packs.read_by_id(db, pack_id)
     if not one_pack:
         if current_user.is_admin:
