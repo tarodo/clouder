@@ -15,7 +15,7 @@ class User(UserBase, table=True):
 
     styles: list["Style"] = Relationship(back_populates="user")
     periods: list["Period"] = Relationship(back_populates="user")
-    sessions: list["Session"] = Relationship(back_populates="user")
+    sessions: list["BPSession"] = Relationship(back_populates="user")
 
 
 class UserIn(UserBase):

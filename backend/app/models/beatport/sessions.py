@@ -1,10 +1,11 @@
 import datetime
 
-from app.models import Pack, User
+from app.models.pack import Pack
+from app.models.users import User
 from sqlmodel import Field, Relationship, SQLModel
 
 
-class SessionBase(SQLModel):
+class BPSessionBase(SQLModel):
     user_id: int = Field(foreign_key="user.id")
     pack_id: int = Field(foreign_key="pack.id")
     sheet_number: int = Field(..., ge=1)
@@ -12,24 +13,24 @@ class SessionBase(SQLModel):
     is_finished: bool = Field(default=False)
 
 
-class SessionBaseDB(SessionBase):
+class BPSessionBaseDB(BPSessionBase):
     pass
 
 
-class Session(SessionBaseDB, table=True):
+class BPSession(BPSessionBaseDB, table=True):
     id: int = Field(primary_key=True)
 
     pack: Pack = Relationship(back_populates="sessions")
     user: User = Relationship(back_populates="sessions")
 
 
-class SessionInDB(SessionBaseDB):
+class BPSessionInDB(BPSessionBaseDB):
     pass
 
 
-class SessionOut(SessionBaseDB):
+class BPSessionOut(BPSessionBaseDB):
     id: int = Field(...)
 
 
-class SessionInApi(SessionBase):
+class BPSessionInApi(BPSessionBase):
     pass

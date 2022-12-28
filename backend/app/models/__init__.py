@@ -1,7 +1,7 @@
 from .beatport.artists import Artist, ArtistInApi, ArtistInDB, ArtistOut
 from .beatport.labels import Label, LabelInApi, LabelInDB, LabelOut
 from .beatport.releases import Release, ReleaseInApi, ReleaseInDB, ReleaseOut
-from .beatport.sessions import Session, SessionInApi, SessionInDB, SessionOut
+from .beatport.sessions import BPSession, BPSessionInApi, BPSessionInDB, BPSessionOut
 from .pack import (Pack, PackInApi, PackInDB, PackOut, PackRelease,
                    PackReleaseInApi, PackReleaseInDB, PackReleaseOut,
                    PackReleaseUpdate)

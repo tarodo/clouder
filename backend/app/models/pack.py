@@ -23,7 +23,7 @@ class Pack(PackBaseDB, table=True):
     period: Period = Relationship(back_populates="packs")
 
     pack_releases: list["PackRelease"] = Relationship(back_populates="pack")
-    sessions: list["Session"] = Relationship(back_populates="pack")
+    sessions: list["BPSession"] = Relationship(back_populates="pack")
 
 
 class PackInDB(PackBaseDB):
