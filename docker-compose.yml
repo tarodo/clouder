@@ -31,3 +31,5 @@ services:
       dockerfile: Dockerfile
     env_file:
       - ./bot/.env
+    volumes:
+      - ./bot/:/usr/src/app

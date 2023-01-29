@@ -6,6 +6,8 @@ import requests
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
+from new_release import get_new_release_conv
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
@@ -23,7 +25,7 @@ async def show_release(
     release_url, update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
     release = get_release_info(release_url)
-    logger.error(f"{release=}")
+    logger.info(f"{release=}")
     version = release[0]["name"]
     await update.message.reply_text(f"Актуальный релиз :: {version}")
 
@@ -36,6 +38,8 @@ def main() -> None:
     application.add_handler(
         CommandHandler("release", partial(show_release, release_url))
     )
+    new_release_conversation = get_new_release_conv()
+    application.add_handler(new_release_conversation)
 
     application.run_polling()
 
