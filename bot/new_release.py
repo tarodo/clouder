@@ -40,13 +40,6 @@ TG_NAME = "tg"
 INSTA_NAME = "insta"
 TWITTER_NAME = "twit"
 
-links = [
-    LinkModel(name=SPOTIFY_NAME, domain="https://open.spotify.com/playlist/"),
-    LinkModel(name=YOUTUBE_NAME, domain="https://music.youtube.com/playlist?list="),
-    LinkModel(name=APPLE_NAME, domain="https://music.apple.com/rs/playlist/"),
-    LinkModel(name=DEEZER_NAME, domain="https://deezer.page.link/"),
-    LinkModel(name=BEATPORT_NAME, domain="https://www.beatport.com/chart/"),
-]
 
 default_tags = {
     f"dnb:melodic:{TG_NAME}": "#DNB #melodic #chart",
@@ -78,11 +71,21 @@ reply_keyboard = [
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
+def get_new_links() -> list[LinkModel]:
+    return [
+        LinkModel(name=SPOTIFY_NAME, domain="https://open.spotify.com/playlist/"),
+        LinkModel(name=YOUTUBE_NAME, domain="https://music.youtube.com/playlist?list="),
+        LinkModel(name=APPLE_NAME, domain="https://music.apple.com/rs/playlist/"),
+        LinkModel(name=DEEZER_NAME, domain="https://deezer.page.link/"),
+        LinkModel(name=BEATPORT_NAME, domain="https://www.beatport.com/chart/"),
+    ]
+
+
 async def show_state(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Reply state of release"""
     release_state: ReleaseModel = context.user_data["release"]
     text = f"Release name : {release_state.name}\n"
-    for link in links:
+    for link in release_state.links:
         text += f"{link.name} :: {link.url}\n"
     await update.message.reply_text(text, reply_markup=markup)
 
@@ -90,8 +93,10 @@ async def show_state(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Start the conversation and ask user for input."""
     context.user_data["release"] = ReleaseModel(
-        name="", tags={}, links=links[:], number="", style="", mood=""
+        name="", tags={}, links=get_new_links(), number="", style="", mood=""
     )
+    logger.error(f"{context.user_data['release']=}")
+
     await update.message.reply_text(
         "Hi! Let's start to create new release.\n"
         "Send me all 5 links and I'll give you posts for social media with tags and links.\n"
