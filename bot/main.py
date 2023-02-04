@@ -3,10 +3,9 @@ import os
 from functools import partial
 
 import requests
+from new_release import get_new_release_conv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
-
-from new_release import get_new_release_conv
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
