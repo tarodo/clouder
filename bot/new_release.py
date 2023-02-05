@@ -1,4 +1,5 @@
 import logging
+import os
 from functools import partial
 from pathlib import Path
 
@@ -6,6 +7,8 @@ from pydantic import BaseModel
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
                           MessageHandler, filters)
+
+from read_notion import handle_release_file_from_zip
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -201,12 +204,21 @@ async def handle_link_message(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def handle_file(temp_dir: str, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     file = await context.bot.get_file(update.message.document)
-    logger.error(f"{temp_dir=} :: {update.message.document.file_name=}")
     Path(temp_dir).mkdir(exist_ok=True)
-    file_path = Path(temp_dir, update.message.document.file_name)
+    file_name = update.message.document.file_name
+    file_path = Path(temp_dir, file_name)
     await file.download(file_path)
 
-    return INIT
+    links = handle_release_file_from_zip(temp_dir, file_name)
+    release_state: ReleaseModel = context.user_data["release"]
+    for link in links.values():
+        updated = handle_one_link(release_state, link)
+        for one_update in updated:
+            await update.message.reply_text(f"Update :: '{one_update}'", reply_markup=markup)
+
+    os.remove(file_path)
+
+    return await finish_release(update, context)
 
 
 def get_new_release_conv(temp_dir: str) -> ConversationHandler:
