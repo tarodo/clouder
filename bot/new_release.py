@@ -95,8 +95,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["release"] = ReleaseModel(
         name="", tags={}, links=get_new_links(), number="", style="", mood=""
     )
-    logger.error(f"{context.user_data['release']=}")
-
     await update.message.reply_text(
         "Hi! Let's start to create new release.\n"
         "Send me all 5 links and I'll give you posts for social media with tags and links.\n"
@@ -159,14 +157,13 @@ async def finish_release(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     return await done(update, context)
 
 
-async def handle_link(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Handle the link of one playlist"""
-    user_text = update.message.text
-    release_state: ReleaseModel = context.user_data["release"]
+def handle_one_link(release_state: ReleaseModel, new_link: str) -> list[str]:
+    updated = []
     for link in release_state.links:
-        if not user_text.startswith(link.domain):
+        if not new_link.startswith(link.domain):
             continue
-        link.url = user_text
+        link.url = new_link
+        updated.append(link.name)
         if link.name == APPLE_NAME:
             release_name = link.url.replace(link.domain, "")
             release_name = release_name.split("/")[0]
@@ -176,12 +173,19 @@ async def handle_link(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
             release_state.mood = release_name[3]
             update_release_name(release_state)
             update_release_tags(release_state)
-            await update.message.reply_text("Update Release Name")
-
-        await update.message.reply_text(f"Update '{link.name}'", reply_markup=markup)
+            updated.append("Release Name")
         break
-    if user_text == STATE:
-        await show_state(update, context)
+    return updated
+
+
+async def handle_link_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Handle the link of one playlist"""
+    user_text = update.message.text
+    release_state: ReleaseModel = context.user_data["release"]
+    updated = handle_one_link(release_state, user_text)
+
+    for one_update in updated:
+        await update.message.reply_text(f"Update :: '{one_update}'", reply_markup=markup)
 
     is_full = True
     for link in release_state.links:
@@ -199,8 +203,11 @@ def get_new_release_conv() -> ConversationHandler:
         states={
             INIT: [
                 MessageHandler(
+                    filters.Regex(f"^{STATE}$"), show_state
+                ),
+                MessageHandler(
                     filters.TEXT & ~(filters.COMMAND | filters.Regex("^Done$")),
-                    handle_link,
+                    handle_link_message,
                 ),
             ],
         },
