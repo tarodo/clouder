@@ -1,4 +1,6 @@
 import logging
+from functools import partial
+from pathlib import Path
 
 from pydantic import BaseModel
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
@@ -197,7 +199,17 @@ async def handle_link_message(update: Update, context: ContextTypes.DEFAULT_TYPE
     return INIT
 
 
-def get_new_release_conv() -> ConversationHandler:
+async def handle_file(temp_dir: str, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    file = await context.bot.get_file(update.message.document)
+    logger.error(f"{temp_dir=} :: {update.message.document.file_name=}")
+    Path(temp_dir).mkdir(exist_ok=True)
+    file_path = Path(temp_dir, update.message.document.file_name)
+    await file.download(file_path)
+
+    return INIT
+
+
+def get_new_release_conv(temp_dir: str) -> ConversationHandler:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("new", start)],
         states={
@@ -209,6 +221,9 @@ def get_new_release_conv() -> ConversationHandler:
                     filters.TEXT & ~(filters.COMMAND | filters.Regex("^Done$")),
                     handle_link_message,
                 ),
+                MessageHandler(
+                    filters.Document.ALL, partial(handle_file, temp_dir)
+                )
             ],
         },
         fallbacks=[

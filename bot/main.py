@@ -33,11 +33,12 @@ def main() -> None:
     """Run the bot."""
     bot_token = os.getenv("BOT_TOKEN")
     release_url = os.getenv("RELEASE_URL")
+    temp_dir = os.getenv("TEMP_DIR")
     application = Application.builder().token(bot_token).build()
     application.add_handler(
         CommandHandler("release", partial(show_release, release_url))
     )
-    new_release_conversation = get_new_release_conv()
+    new_release_conversation = get_new_release_conv(temp_dir)
     application.add_handler(new_release_conversation)
 
     application.run_polling()
