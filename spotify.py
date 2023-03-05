@@ -8,6 +8,8 @@ from common import clear_artists_name
 from models import (BeatportPlaylistModel, BeatportTrackModel,
                     SpotifyArtistModel, SpotifyTrackModel)
 
+from datetime import date
+
 logger = logging.getLogger("spotify")
 logger.setLevel(logging.DEBUG)
 handler_st = logging.StreamHandler()
@@ -45,12 +47,18 @@ def get_author(author_info: dict) -> SpotifyArtistModel:
 
 
 def get_track(track_info: dict) -> SpotifyTrackModel:
+    track_date = None
+    try:
+        track_date = date.fromisoformat(track_info["album"]["release_date"])
+    except ValueError as e:
+        logger.error(e)
+        logger.error(track_info)
     sp_track = SpotifyTrackModel(
         title=track_info["name"],
         id=track_info["id"],
         url=track_info["external_urls"]["spotify"],
         artists=[get_author(author) for author in track_info["artists"]],
-        release_date=track_info["album"]["release_date"],
+        release_date=track_date,
     )
     return sp_track
 

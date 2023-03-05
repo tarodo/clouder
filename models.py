@@ -46,4 +46,4 @@ class SpotifyTrackModel(TrackModel):
     id: str
     url: str
     artists: list[SpotifyArtistModel] | None
-    release_date: date
+    release_date: date | None
