@@ -1,6 +1,6 @@
 import uuid
-from zipfile import ZipFile
 from pathlib import Path
+from zipfile import ZipFile
 
 
 def handle_release_file_from_zip(tmp_dir: str, release_file: str) -> dict:

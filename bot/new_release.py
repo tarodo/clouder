@@ -4,11 +4,10 @@ from functools import partial
 from pathlib import Path
 
 from pydantic import BaseModel
+from read_notion import handle_release_file_from_zip
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (CommandHandler, ContextTypes, ConversationHandler,
                           MessageHandler, filters)
-
-from read_notion import handle_release_file_from_zip
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -71,6 +70,9 @@ default_tags = {
     f"techno:low:{INSTA_NAME}": "#techno #melody #technomusic #clouder_techno #clouder_chart #clouder #technochart #musicchart #music2023 #techno2023",
     f"techno:mid:{TWITTER_NAME}": "#techno #playlist #chart #clouder_techno_mid",
     f"techno:low:{TWITTER_NAME}": "#techno #playlist #chart #clouder_techno_low",
+    f"house:vocal:{TG_NAME}": "#House #vocal #chart",
+    f"house:vocal:{INSTA_NAME}": "#house #vocal #housemusic #clouder_house #clouder_chart #clouder #housechart #musicchart #music2023 #house2023",
+    f"house:vocal:{TWITTER_NAME}": "#house #playlist #chart #clouder_house_vocal",
 }
 
 reply_keyboard = [
@@ -186,14 +188,18 @@ def handle_one_link(release_state: ReleaseModel, new_link: str) -> list[str]:
     return updated
 
 
-async def handle_link_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def handle_link_message(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> int:
     """Handle the link of one playlist"""
     user_text = update.message.text
     release_state: ReleaseModel = context.user_data["release"]
     updated = handle_one_link(release_state, user_text)
 
     for one_update in updated:
-        await update.message.reply_text(f"Update :: '{one_update}'", reply_markup=markup)
+        await update.message.reply_text(
+            f"Update :: '{one_update}'", reply_markup=markup
+        )
 
     is_full = True
     for link in release_state.links:
@@ -205,7 +211,9 @@ async def handle_link_message(update: Update, context: ContextTypes.DEFAULT_TYPE
     return INIT
 
 
-async def handle_file(temp_dir: str, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def handle_file(
+    temp_dir: str, update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> int:
     file = await context.bot.get_file(update.message.document)
     Path(temp_dir).mkdir(exist_ok=True)
     file_name = update.message.document.file_name
@@ -217,7 +225,9 @@ async def handle_file(temp_dir: str, update: Update, context: ContextTypes.DEFAU
     for link in links.values():
         updated = handle_one_link(release_state, link)
         for one_update in updated:
-            await update.message.reply_text(f"Update :: '{one_update}'", reply_markup=markup)
+            await update.message.reply_text(
+                f"Update :: '{one_update}'", reply_markup=markup
+            )
 
     os.remove(file_path)
 
@@ -229,16 +239,12 @@ def get_new_release_conv(temp_dir: str) -> ConversationHandler:
         entry_points=[CommandHandler("new", start)],
         states={
             INIT: [
-                MessageHandler(
-                    filters.Regex(f"^{STATE}$"), show_state
-                ),
+                MessageHandler(filters.Regex(f"^{STATE}$"), show_state),
                 MessageHandler(
                     filters.TEXT & ~(filters.COMMAND | filters.Regex("^Done$")),
                     handle_link_message,
                 ),
-                MessageHandler(
-                    filters.Document.ALL, partial(handle_file, temp_dir)
-                )
+                MessageHandler(filters.Document.ALL, partial(handle_file, temp_dir)),
             ],
         },
         fallbacks=[
