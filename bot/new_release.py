@@ -157,6 +157,7 @@ async def finish_release(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if tag == INSTA_NAME:
             text = release.name
             text += f"\n{release.tags[tag]}"
+            text += f"\nPlaylist is in Stories or by the link in the account profile"
             await update.message.reply_text(text)
         if tag == TWITTER_NAME:
             text = release.name
