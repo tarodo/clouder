@@ -58,10 +58,12 @@ function readAllReleases() {
 
   const style_name = cur_url.pathname.split("/")[2]
   const page = cur_url.searchParams.get('page')
-  const start_date = cur_url.searchParams.get('start-date')
-  const end_date = cur_url.searchParams.get('end-date')
 
-  let new_releases = document.getElementsByClassName("bucket-item");
+  const dateString = cur_url.searchParams.get('publish_date')
+  const decodedString = decodeURIComponent(dateString);
+  const [start_date, end_date] = decodedString.split(":");
+
+  let new_releases = document.getElementsByClassName("gSaMFX");
   let releases = {}
   for (const work_element of new_releases) {
     let release = handleRelease(work_element)
