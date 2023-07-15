@@ -55,7 +55,7 @@ function readAllReleases() {
 
     let raw_artists = release.querySelector('div.sc-d6bcf006-0.eOcWlw').querySelectorAll('a')
     new_release["artists"] = handleReleaseArtists(raw_artists)
-    //
+
     let raw_labels = release.querySelector('div.sc-e751ecad-0.cNVqXt.cell.label').querySelectorAll('a')
     new_release["labels"] = handleReleaseLabels(raw_labels)
 
