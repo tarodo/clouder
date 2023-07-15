@@ -14,36 +14,52 @@ function readAllReleases() {
     console.log(token)
   });
 
-  function handleRelease(release) {
+  function handleReleaseArtists(raw_artists) {
+    let artists = []
+      raw_artists.forEach(function(artist) {
+      let name = artist.textContent
+      let id = artist.getAttribute('href').split('/').pop()
+      let uri = artist.getAttribute('href')
+
+      artists.push({
+        name: name,
+        id: id,
+        uri: uri
+      })
+    })
+    return artists
+  }
+
+  function handleReleaseLabels(raw_labels) {
+      let labels = []
+      raw_labels.forEach(function(label) {
+      let name = label.textContent
+      let id = label.getAttribute('href').split('/').pop()
+      let uri = label.getAttribute('href')
+
+      labels.push({
+        name: name,
+        id: id,
+        uri: uri
+      })
+    })
+    return labels
+  }
+
+  function handleRelease(release, idx) {
     let new_release = {}
-    new_release["id"] = release.getAttribute("data-ec-id")
-    new_release["title"] = release.getAttribute("data-ec-name")
-    new_release["r_link"] = release.getElementsByClassName("horz-release-artwork-parent")[0].getElementsByTagName("a")[0].getAttribute("href")
-    new_release["session_position"] = release.getAttribute("data-ec-position")
+    new_release["uri"] = release.querySelector('a.artwork').getAttribute('href')
+    new_release["title"] = release.querySelector('span.erNSOX').textContent.trim()
+    new_release["id"] = release.querySelector('a.artwork').getAttribute('href').split('/').pop()
+    new_release["position"] = idx
 
-    let raw_artists = release.getElementsByClassName("buk-horz-release-artists")[0].getElementsByTagName("a")
-    let artists = {}
-    for (const art of raw_artists) {
-      let art_id = art.getAttribute("data-artist")
-      artists[art_id] = {
-        art_link: art.getAttribute("href"),
-        art_title: art.innerText
-      }
-    }
-    new_release["artists"] = artists
+    let raw_artists = release.querySelector('div.sc-d6bcf006-0.eOcWlw').querySelectorAll('a')
+    new_release["artists"] = handleReleaseArtists(raw_artists)
+    //
+    let raw_labels = release.querySelector('div.sc-e751ecad-0.cNVqXt.cell.label').querySelectorAll('a')
+    new_release["labels"] = handleReleaseLabels(raw_labels)
 
-    let raw_labels = release.getElementsByClassName("buk-horz-release-labels")[0].getElementsByTagName("a")
-    let labels = {}
-    for (const label of raw_labels) {
-      let label_id = label.getAttribute("data-label")
-      labels[label_id] = {
-        label_link: label.getAttribute("href"),
-        label_title: label.innerText
-      }
-    }
-    new_release["labels"] = labels
-
-    new_release["date"] = release.getElementsByClassName("buk-horz-release-released")[0].innerText
+    new_release["date"] = release.querySelector('div.sc-e751ecad-0.cNVqXt.cell.date').textContent.trim()
 
     return new_release
   }
@@ -65,8 +81,10 @@ function readAllReleases() {
 
   let new_releases = document.getElementsByClassName("gSaMFX");
   let releases = {}
+  let idx = 0
   for (const work_element of new_releases) {
-    let release = handleRelease(work_element)
+    idx = idx + 1
+    let release = handleRelease(work_element, idx)
     if (release) {
       releases[release.id] = release
     }
@@ -79,5 +97,6 @@ function readAllReleases() {
     end_date: end_date,
     releases: releases
   }
+
   console.log(session_page)
 }
