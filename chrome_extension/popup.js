@@ -97,6 +97,29 @@ function readAllReleases() {
     end_date: end_date,
     releases: releases
   }
-
   console.log(session_page)
+
+  function addYellowDot() {
+    const insertPlaces = document.querySelectorAll('div.sc-e751ecad-1.gSaMFX.row')
+    console.log(insertPlaces)
+    insertPlaces.forEach(function (place) {
+      const clouderInfo = document.createElement('div')
+      clouderInfo.className = 'sc-e751ecad-0 cNVqXt'
+      const newSpan = document.createElement('span')
+
+      newSpan.className = 'fade'
+
+      const yellowDot = document.createElement('div')
+      yellowDot.style.width = '10px'
+      yellowDot.style.height = '10px'
+      yellowDot.style.backgroundColor = 'rgb(57, 192, 222)'
+      yellowDot.style.borderRadius = '50%'
+
+      newSpan.appendChild(yellowDot)
+      clouderInfo.appendChild(newSpan)
+      place.prepend(clouderInfo)
+    })
+  }
+
+  addYellowDot()
 }
