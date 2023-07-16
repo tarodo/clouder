@@ -139,6 +139,7 @@ function readAllReleases() {
     let newDiv = document.createElement('div')
     newDiv.className = 'sc-347751ec-7 cveLdp'
     newDiv.style.height = '30px'
+    newDiv.style.justifyContent = 'left'
     let playlistIds = {
       'Melodic': 1600521,
       'Party': 1597656,
@@ -154,7 +155,7 @@ function readAllReleases() {
     statusSpan.style.padding = '8px'
     statusSpan.style.paddingLeft = '35px'
     statusSpan.style.display = 'block'
-    statusSpan.style.width = '100%'
+    statusSpan.style.width = '1150px'
     statusSpan.style.textAlign = 'left'
     newDiv.appendChild(statusSpan)
 
