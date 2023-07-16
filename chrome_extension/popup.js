@@ -1,7 +1,7 @@
-let startSession = document.getElementById("start_session");
+let startSession = document.getElementById("start_session")
 
 startSession.addEventListener("click", async () => {
-  let [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+  let [tab] = await chrome.tabs.query({active: true, currentWindow: true})
   chrome.scripting.executeScript({
     target: {tabId: tab.id},
     func: readAllReleases,
@@ -10,7 +10,7 @@ startSession.addEventListener("click", async () => {
 
 function readAllReleases() {
   chrome.storage.sync.get('access_token', function (result) {
-    let token = result.access_token;
+    let token = result.access_token
     console.log(token)
   });
 
@@ -112,7 +112,7 @@ function readAllReleases() {
       const yellowDot = document.createElement('div')
       yellowDot.style.width = '10px'
       yellowDot.style.height = '10px'
-      yellowDot.classList.add('dot--yellow');
+      yellowDot.classList.add('dot--yellow')
       yellowDot.style.borderRadius = '50%'
 
       newSpan.appendChild(yellowDot)
@@ -147,31 +147,44 @@ function readAllReleases() {
       'ReDrum': 1597654,
       'Exper': 1597917
     }
-    let spanNames = Object.keys(playlistIds);
+    let spanNames = Object.keys(playlistIds)
+
+    let statusSpan = document.createElement('span')
+    statusSpan.className = 'sc-347751ec-5 hcrYxg clouder-status'
+    statusSpan.style.padding = '8px'
+    statusSpan.style.paddingLeft = '35px'
+    statusSpan.style.display = 'block'
+    statusSpan.style.width = '100%'
+    statusSpan.style.textAlign = 'left'
+    newDiv.appendChild(statusSpan)
 
     spanNames.forEach(function(name) {
         const newSpan = document.createElement('span')
-        newSpan.className = 'sc-cdd38545-4 erNSOX';
-        newSpan.textContent = name;  // Устанавливаем название из массива
-        newSpan.style.padding = '8px';
+        newSpan.className = 'sc-cdd38545-4 erNSOX'
+        newSpan.textContent = name
+        newSpan.style.padding = '8px'
         newSpan.addEventListener('click', async function() {
           let playlistName = this.textContent
           let playlistId = playlistIds[playlistName]
           console.log('Playlist: ' + playlistName + ' :: ID: ' + playlistId)
           let trackID = document.querySelector('.sc-347751ec-6.jtjvJw > a').getAttribute('href').split('/').pop()
-          console.log('Track ID: ' + trackID)
+          let trackElement = document.querySelector('.sc-347751ec-6.jtjvJw > a > .sc-347751ec-5.hcrYxg')
+          let trackTitle = trackElement.textContent.trim();
           let response = await postData(`https://api.beatport.com/v4/my/playlists/${playlistId}/tracks/bulk/`, {track_ids:[trackID]})
 
           if (!response.ok) {
-              console.error('HTTP error', response.status)
+            console.error('HTTP error', response.status)
+            statusSpan.textContent = `Some problem with Track '${trackTitle}' :: ID ${trackID} and '${this.textContent}' playlist`
           } else {
-              console.log('Track added successfully')
+            console.log('Track added successfully')
+            statusSpan.textContent = `Track '${trackTitle}' loaded to '${this.textContent}' playlist`
+            console.log(`Track '${trackTitle}' with ID ${trackID} loaded to '${this.textContent}' playlist`)
           }
         });
 
         const newAnchor = document.createElement('a')
-        newAnchor.title = name;  // Устанавливаем название из массива
-        newAnchor.href = '#';
+        newAnchor.title = name
+        newAnchor.href = '#'
         newAnchor.appendChild(newSpan)
 
         newDiv.appendChild(newAnchor)
@@ -180,7 +193,7 @@ function readAllReleases() {
     if (parentDiv.firstChild) {
         parentDiv.insertBefore(newDiv, parentDiv.firstChild.nextSibling)
     } else {
-        parentDiv.appendChild(newDiv);
+        parentDiv.appendChild(newDiv)
     }
   }
 

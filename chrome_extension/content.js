@@ -1,15 +1,17 @@
 function handleClick(event) {
-  let parent = event.target.closest('.sc-cdd38545-6.ZuJgX');
+  let parent = event.target.closest('.sc-cdd38545-6.ZuJgX')
+  let statusSpan = document.querySelector('.clouder-status')
   if (parent) {
-    let artwork = parent.querySelector('.artwork');
+    let artwork = parent.querySelector('.artwork')
 
     if (artwork) {
       console.log('Release ID: ', artwork.getAttribute('href').split('/').pop().trim())
+      statusSpan.textContent = ''
     } else {
-      console.log('Artwork element not found.');
+      console.log('Artwork element not found.')
     }
   } else {
-    console.log('Parent element not found.');
+    console.log('Parent element not found.')
   }
 }
 
@@ -20,7 +22,7 @@ function addEventListenersToButtons() {
   });
 }
 
-addEventListenersToButtons();
+addEventListenersToButtons()
 
 let observer = new MutationObserver(function(mutations) {
   mutations.forEach(function(mutation) {
@@ -32,4 +34,4 @@ let observer = new MutationObserver(function(mutations) {
 
 let config = { childList: true, subtree: true }
 
-observer.observe(document.body, config);
+observer.observe(document.body, config)
