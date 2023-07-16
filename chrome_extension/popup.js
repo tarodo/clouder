@@ -112,7 +112,7 @@ function readAllReleases() {
       const yellowDot = document.createElement('div')
       yellowDot.style.width = '10px'
       yellowDot.style.height = '10px'
-      yellowDot.style.backgroundColor = 'rgb(57, 192, 222)'
+      yellowDot.classList.add('dot--yellow');
       yellowDot.style.borderRadius = '50%'
 
       newSpan.appendChild(yellowDot)
@@ -121,5 +121,40 @@ function readAllReleases() {
     })
   }
 
+  function addPlaylistControl() {
+    let parentDiv = document.querySelector('.sc-347751ec-8.gSeLef');
+
+    let newDiv = document.createElement('div');
+    newDiv.className = 'sc-347751ec-7 cveLdp';
+    newDiv.style.height = '30px';
+
+    let spanNames = ['Melodic', 'Party', 'Hard', 'Melan', 'ReDrum', 'Exper'];
+
+    spanNames.forEach(function(name) {
+        const newSpan = document.createElement('span');
+        newSpan.className = 'sc-cdd38545-4 erNSOX';
+        newSpan.textContent = name
+        newSpan.style.padding = '12px';
+        newSpan.addEventListener('click', async function() {
+            console.log(this.textContent);
+        });
+
+        const newAnchor = document.createElement('a');
+        newAnchor.title = name;  // Устанавливаем название из массива
+        newAnchor.href = '#';
+        newAnchor.appendChild(newSpan);
+
+        newDiv.appendChild(newAnchor);
+    });
+
+    if (parentDiv.firstChild) {
+        parentDiv.insertBefore(newDiv, parentDiv.firstChild.nextSibling);
+    } else {
+        parentDiv.appendChild(newDiv);
+    }
+  }
+
+
   addYellowDot()
+  addPlaylistControl()
 }

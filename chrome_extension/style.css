@@ -1,0 +1,17 @@
+.dot {
+  width: 10px;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.dot--yellow {
+  background-color: yellow;
+}
+
+.dot--green {
+  background-color: green;
+}
+
+.dot--blue {
+  background-color: blue;
+}
