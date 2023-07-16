@@ -121,34 +121,64 @@ function readAllReleases() {
     })
   }
 
+  async function postData(url = '', data = {}) {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer XbnQbnM6C2PZlhPeu7SPH66D4n1QCK'
+      },
+      body: JSON.stringify(data)
+    })
+    return response
+  }
+
   function addPlaylistControl() {
-    let parentDiv = document.querySelector('.sc-347751ec-8.gSeLef');
+    let parentDiv = document.querySelector('.sc-347751ec-8.gSeLef')
 
-    let newDiv = document.createElement('div');
-    newDiv.className = 'sc-347751ec-7 cveLdp';
-    newDiv.style.height = '30px';
-
-    let spanNames = ['Melodic', 'Party', 'Hard', 'Melan', 'ReDrum', 'Exper'];
+    let newDiv = document.createElement('div')
+    newDiv.className = 'sc-347751ec-7 cveLdp'
+    newDiv.style.height = '30px'
+    let playlistIds = {
+      'Melodic': 1600521,
+      'Party': 1597656,
+      'Hard': 1597645,
+      'Melan': 1597650,
+      'ReDrum': 1597654,
+      'Exper': 1597917
+    }
+    let spanNames = Object.keys(playlistIds);
 
     spanNames.forEach(function(name) {
-        const newSpan = document.createElement('span');
+        const newSpan = document.createElement('span')
         newSpan.className = 'sc-cdd38545-4 erNSOX';
-        newSpan.textContent = name
-        newSpan.style.padding = '12px';
+        newSpan.textContent = name;  // Устанавливаем название из массива
+        newSpan.style.padding = '8px';
         newSpan.addEventListener('click', async function() {
-            console.log(this.textContent);
+          let playlistName = this.textContent
+          let playlistId = playlistIds[playlistName]
+          console.log('Playlist: ' + playlistName + ' :: ID: ' + playlistId)
+          let trackID = document.querySelector('.sc-347751ec-6.jtjvJw > a').getAttribute('href').split('/').pop()
+          console.log('Track ID: ' + trackID)
+          let response = await postData(`https://api.beatport.com/v4/my/playlists/${playlistId}/tracks/bulk/`, {track_ids:[trackID]})
+
+          if (!response.ok) {
+              console.error('HTTP error', response.status)
+          } else {
+              console.log('Track added successfully')
+          }
         });
 
-        const newAnchor = document.createElement('a');
+        const newAnchor = document.createElement('a')
         newAnchor.title = name;  // Устанавливаем название из массива
         newAnchor.href = '#';
-        newAnchor.appendChild(newSpan);
+        newAnchor.appendChild(newSpan)
 
-        newDiv.appendChild(newAnchor);
+        newDiv.appendChild(newAnchor)
     });
 
     if (parentDiv.firstChild) {
-        parentDiv.insertBefore(newDiv, parentDiv.firstChild.nextSibling);
+        parentDiv.insertBefore(newDiv, parentDiv.firstChild.nextSibling)
     } else {
         parentDiv.appendChild(newDiv);
     }
