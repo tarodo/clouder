@@ -126,7 +126,7 @@ function readAllReleases() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer XbnQbnM6C2PZlhPeu7SPH66D4n1QCK'
+        'Authorization': 'Bearer AIEUyWlvOWSEvx5Sq5kL7fB4l86xkE'
       },
       body: JSON.stringify(data)
     })
@@ -139,7 +139,7 @@ function readAllReleases() {
     let newDiv = document.createElement('div')
     newDiv.className = 'sc-347751ec-7 cveLdp'
     newDiv.style.height = '30px'
-    newDiv.style.justifyContent = 'left'
+    newDiv.style.justifyContent = 'center'
     let playlistIds = {
       'Melodic': 1600521,
       'Party': 1597656,
@@ -155,7 +155,7 @@ function readAllReleases() {
     statusSpan.style.padding = '8px'
     statusSpan.style.paddingLeft = '35px'
     statusSpan.style.display = 'block'
-    statusSpan.style.width = '1150px'
+    statusSpan.style.width = '500px'
     statusSpan.style.textAlign = 'left'
     newDiv.appendChild(statusSpan)
 
@@ -189,7 +189,12 @@ function readAllReleases() {
         newAnchor.appendChild(newSpan)
 
         newDiv.appendChild(newAnchor)
-    });
+    })
+
+    let pseudoStatusSpan = document.createElement('span')
+    pseudoStatusSpan.className = 'sc-347751ec-5 hcrYxg clouder-status'
+    pseudoStatusSpan.style.width = '500px'
+    newDiv.appendChild(pseudoStatusSpan)
 
     if (parentDiv.firstChild) {
         parentDiv.insertBefore(newDiv, parentDiv.firstChild.nextSibling)

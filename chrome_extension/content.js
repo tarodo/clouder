@@ -6,7 +6,7 @@ function handleClick(event) {
 
     if (artwork) {
       console.log('Release ID: ', artwork.getAttribute('href').split('/').pop().trim())
-      statusSpan.textContent = ''
+      statusSpan ? statusSpan.textContent = '' : ''
     } else {
       console.log('Artwork element not found.')
     }
