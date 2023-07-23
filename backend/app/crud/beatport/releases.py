@@ -47,3 +47,11 @@ def create(db: Session, payload: ReleaseInDB, artists: list[Artist] | None) -> R
 
 def remove(db: Session, db_obj: Release) -> Release:
     return common.remove(db, db_obj)
+
+
+def make_audited(db: Session, release: Release) -> Release:
+    release.audited = True
+    db.add(release)
+    db.commit()
+    db.refresh(release)
+    return release

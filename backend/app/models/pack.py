@@ -42,7 +42,6 @@ class PackInApi(PackBase):
 class PackReleaseBase(SQLModel):
     pack_id: int = Field(foreign_key="pack.id", primary_key=True)
     release_id: int = Field(foreign_key="release.id", primary_key=True)
-    audited: bool = Field(nullable=False, default=False)
 
 
 class PackReleaseBaseDB(PackReleaseBase):

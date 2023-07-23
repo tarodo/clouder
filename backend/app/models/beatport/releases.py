@@ -11,6 +11,7 @@ class ReleaseBase(SQLModel):
     name: name_con = Field(index=True, nullable=False)
     url: url_con = Field(nullable=False)
     bp_id: int = Field(index=True, nullable=False, sa_column_kwargs={"unique": True})
+    audited: bool = Field(nullable=False, default=False)
 
 
 class ReleaseBaseDB(ReleaseBase):

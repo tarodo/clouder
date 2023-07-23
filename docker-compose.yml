@@ -22,6 +22,8 @@ services:
     build:
       context: ./db
       dockerfile: Dockerfile
+    ports:
+      - 5432:5432
     env_file:
       - ./db/.env
 

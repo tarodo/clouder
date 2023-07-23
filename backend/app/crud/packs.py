@@ -29,7 +29,7 @@ def remove(db: Session, db_obj: Pack) -> Pack:
 
 
 def add_release(db: Session, pack: Pack, release: Release) -> Pack:
-    new_pack_release = PackRelease(pack=pack, release=release, audited=False)
+    new_pack_release = PackRelease(pack=pack, release=release)
     db.add(new_pack_release)
     db.commit()
     db.refresh(pack)
@@ -42,12 +42,4 @@ def read_pack_release(db: Session, pack: Pack, release: Release) -> PackRelease:
         PackRelease.release == release
     )
     pack_release = db.exec(pack_release_query).one()
-    return pack_release
-
-
-def make_audited(db: Session, pack_release: PackRelease) -> PackRelease:
-    pack_release.audited = True
-    db.add(pack_release)
-    db.commit()
-    db.refresh(pack_release)
     return pack_release
