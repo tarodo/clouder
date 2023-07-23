@@ -27,6 +27,9 @@ def create_release(
     db: Session = Depends(deps.get_db),
 ) -> Release:
     """Create one release"""
+    old_release = releases.read_by_bp_id(db, payload.bp_id)
+    if old_release:
+        raise_400(ReleasesErrors.ReleaseAlreadyExists)
     if payload.label_id:
         q_label = labels.read_by_id(db, payload.label_id)
         if not q_label:
