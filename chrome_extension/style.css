@@ -4,14 +4,14 @@
   border-radius: 50%;
 }
 
-.dot--yellow {
+.dot--default {
   background-color: yellow;
 }
 
-.dot--green {
-  background-color: green;
+.dot--added {
+  background-color: #39c0de;
 }
 
-.dot--blue {
-  background-color: blue;
+.dot--audited {
+  background-color: #01ff95;
 }

@@ -10,11 +10,25 @@ startSession.addEventListener("click", async () => {
   });
 });
 
-function readAllReleases(bp_token) {
-  chrome.storage.sync.get('access_token', function (result) {
-    let token = result.access_token
-    console.log(token)
-  });
+
+async function readAllReleases(bp_token) {
+
+  function getToken() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get('access_token', function(result) {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                resolve(result.access_token);
+            }
+        });
+    });
+}
+
+  let token = await getToken()
+  // chrome.storage.sync.get('access_token', function (result) {
+  //   token = result.access_token
+  // });
 
   function handleReleaseArtists(raw_artists) {
     let artists = []
@@ -48,7 +62,45 @@ function readAllReleases(bp_token) {
     return labels
   }
 
-  function handleRelease(release, idx) {
+  function regRelease(token, release) {
+    console.log(token)
+    console.log(release)
+    const response = fetch(`http://127.0.0.1:8006/releases/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: release["title"],
+        url: release["uri"],
+        bp_id: release["id"]
+      })
+    }).then(response => response.json()).then(data => {
+      console.log(data)
+    });
+
+  }
+
+  function addYellowDot(release_row) {
+    const clouderInfo = document.createElement('div')
+    clouderInfo.className = 'sc-e751ecad-0 cNVqXt'
+    const newSpan = document.createElement('span')
+
+    newSpan.className = 'fade'
+
+    const yellowDot = document.createElement('div')
+    yellowDot.style.width = '10px'
+    yellowDot.style.height = '10px'
+    yellowDot.classList.add('dot--audited')
+    yellowDot.style.borderRadius = '50%'
+
+    newSpan.appendChild(yellowDot)
+    clouderInfo.appendChild(newSpan)
+    release_row.prepend(clouderInfo)
+  }
+
+  function handleRelease(release, idx, token) {
     let new_release = {}
     new_release["uri"] = release.querySelector('a.artwork').getAttribute('href')
     new_release["title"] = release.querySelector('span.erNSOX').textContent.trim()
@@ -62,6 +114,9 @@ function readAllReleases(bp_token) {
     new_release["labels"] = handleReleaseLabels(raw_labels)
 
     new_release["date"] = release.querySelector('div.sc-e751ecad-0.cNVqXt.cell.date').textContent.trim()
+
+    addYellowDot(release)
+    regRelease(token, new_release)
 
     return new_release
   }
@@ -86,7 +141,7 @@ function readAllReleases(bp_token) {
   let idx = 0
   for (const work_element of new_releases) {
     idx = idx + 1
-    let release = handleRelease(work_element, idx)
+    let release = handleRelease(work_element, idx, token)
     if (release) {
       releases[release.id] = release
     }
@@ -100,28 +155,6 @@ function readAllReleases(bp_token) {
     releases: releases
   }
   console.log(session_page)
-
-  function addYellowDot() {
-    const insertPlaces = document.querySelectorAll('div.sc-e751ecad-1.gSaMFX.row')
-    console.log(insertPlaces)
-    insertPlaces.forEach(function (place) {
-      const clouderInfo = document.createElement('div')
-      clouderInfo.className = 'sc-e751ecad-0 cNVqXt'
-      const newSpan = document.createElement('span')
-
-      newSpan.className = 'fade'
-
-      const yellowDot = document.createElement('div')
-      yellowDot.style.width = '10px'
-      yellowDot.style.height = '10px'
-      yellowDot.classList.add('dot--yellow')
-      yellowDot.style.borderRadius = '50%'
-
-      newSpan.appendChild(yellowDot)
-      clouderInfo.appendChild(newSpan)
-      place.prepend(clouderInfo)
-    })
-  }
 
   async function postData(url = '', data = {}) {
     const response = await fetch(url, {
@@ -206,7 +239,5 @@ function readAllReleases(bp_token) {
     }
   }
 
-
-  addYellowDot()
   addPlaylistControl()
 }
