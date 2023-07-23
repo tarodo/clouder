@@ -2,13 +2,15 @@ let startSession = document.getElementById("start_session")
 
 startSession.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({active: true, currentWindow: true})
+  let bp_token = document.getElementById("bpToken").value
   chrome.scripting.executeScript({
     target: {tabId: tab.id},
     func: readAllReleases,
+    args: [bp_token]
   });
 });
 
-function readAllReleases() {
+function readAllReleases(bp_token) {
   chrome.storage.sync.get('access_token', function (result) {
     let token = result.access_token
     console.log(token)
@@ -126,7 +128,7 @@ function readAllReleases() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer AIEUyWlvOWSEvx5Sq5kL7fB4l86xkE'
+        'Authorization': 'Bearer ' + bp_token
       },
       body: JSON.stringify(data)
     })
@@ -183,9 +185,10 @@ function readAllReleases() {
           }
         });
 
-        const newAnchor = document.createElement('a')
+        const newAnchor = document.createElement('div')
         newAnchor.title = name
-        newAnchor.href = '#'
+        newAnchor.style.cursor = "pointer"
+        // newAnchor.href = '#'
         newAnchor.appendChild(newSpan)
 
         newDiv.appendChild(newAnchor)

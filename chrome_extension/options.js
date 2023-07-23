@@ -1,4 +1,4 @@
-const api_url = "http://127.0.0.1:8007"
+const api_url = "http://127.0.0.1:8006"
 
 let startSession = document.getElementById("loginMe");
 
