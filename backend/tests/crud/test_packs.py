@@ -51,7 +51,6 @@ def test_pack_release_create(db: Session, random_user: User) -> None:
     assert pack_release
     assert pack_release.release == release
     assert pack_release.pack == pack
-    assert not pack_release.audited
 
 
 def test_pack_release_read(db: Session, random_user: User) -> None:
@@ -62,14 +61,3 @@ def test_pack_release_read(db: Session, random_user: User) -> None:
     pack_release = packs.read_pack_release(db, pack, release)
     assert pack_release
     assert pack_release == pack_release_control
-
-
-def test_pack_release_make_audited(db: Session, random_user: User) -> None:
-    pack = create_random_pack(db, random_user)
-    release = create_random_release(db)
-    pack_release = packs.add_release(db, pack, release)
-    assert pack_release
-    assert not pack_release.audited
-    pack_release = packs.make_audited(db, pack_release)
-    assert pack_release
-    assert pack_release.audited

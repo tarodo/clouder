@@ -28,12 +28,12 @@ def remove(db: Session, db_obj: Pack) -> Pack:
     return common.remove(db, db_obj)
 
 
-def add_release(db: Session, pack: Pack, release: Release) -> Pack:
+def add_release(db: Session, pack: Pack, release: Release) -> PackRelease:
     new_pack_release = PackRelease(pack=pack, release=release)
     db.add(new_pack_release)
     db.commit()
-    db.refresh(pack)
-    return pack
+    db.refresh(new_pack_release)
+    return new_pack_release
 
 
 def read_pack_release(db: Session, pack: Pack, release: Release) -> PackRelease:
