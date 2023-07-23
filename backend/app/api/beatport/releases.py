@@ -135,3 +135,19 @@ def remove(
     if not one_release:
         raise_400(ReleasesErrors.ReleaseDoesNotExist, release_id)
     return releases.remove(db, one_release)
+
+
+@router.post(
+    "/{release_id}/audited", response_model=ReleaseOut, status_code=200, responses=responses
+)
+def make_audited(
+    release_id: int = Path(..., gt=0),
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db),
+) -> Release | None:
+    """Retrieve a release by id"""
+    one_release = releases.read_by_id(db, release_id)
+    if not one_release:
+        raise_400(ReleasesErrors.ReleaseDoesNotExist, release_id)
+    one_release = releases.make_audited(db, one_release)
+    return one_release
