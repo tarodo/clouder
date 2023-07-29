@@ -27,10 +27,14 @@ You need to create `.env` file in './bot' directory:
 
 ## Start
 ### Start in Docker-compose
-1. `docker-compose up --build`
+```shell
+docker-compose up --build
+```
 
 ### Start test
-1. `docker-compose exec back python -m pytest --cov app`
+```shell
+docker-compose exec back python -m pytest --cov app
+```
 
 ## Contribute
 ### Schemas changes
