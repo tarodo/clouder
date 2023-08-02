@@ -65,7 +65,7 @@ def read_many_by_bp_id(
     bp_id: int | None = Query(None, ge=1),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
-) -> list[Release] | None:
+) -> Release | None:
     """Retrieve one release by beatport ID"""
     return releases.read_by_bp_id(db, bp_id)
 
@@ -95,7 +95,7 @@ def read_many_by_label(
     status_code=200,
     responses=responses,
 )
-def read_many(
+def read_many_by_artist(
     artist_id: int | None = Query(None, ge=1),
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(deps.get_db),
