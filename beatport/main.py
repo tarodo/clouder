@@ -2,6 +2,8 @@ import requests
 import uvicorn
 from fastapi import FastAPI, Path, Query
 
+from playlists import collect_playlist
+
 app = FastAPI()
 
 
@@ -14,16 +16,10 @@ async def root():
 def create_user(
     bp_playlist_id: int = Path(..., gt=0), bp_token: str | None = Query(None)
 ):
-    url = f"https://api.beatport.com/v4/my/playlists/{bp_playlist_id}/tracks/"
-    params = {"page": 1, "per_page": 10}
-    headers = {"Authorization": f"Bearer {bp_token}"}
-    r = requests.get(url, params=params, headers=headers)
-    playlist = r.json()
+    tracks = collect_playlist(bp_playlist_id, bp_token)
 
     return {
-        "bp_token": bp_token,
-        "bp_playlist_id": bp_playlist_id,
-        "playlist": playlist,
+        "tracks": tracks
     }
 
 
