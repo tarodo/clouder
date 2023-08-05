@@ -1,7 +1,7 @@
 from fastapi import FastAPI
+from playlists import create_playlist_from_bp
 
 from models import PlaylistIn
-from playlists import create_playlist_from_bp
 
 app = FastAPI()
 
