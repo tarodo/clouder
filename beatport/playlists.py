@@ -1,5 +1,3 @@
-from typing import Tuple, Any, Dict
-
 import requests
 from pydantic import BaseModel
 
@@ -15,11 +13,13 @@ PLAYLISTS = {
     1597656: "Party",
     1597654: "ReDrum",
     1597650: "Melancholy",
-    1597645: "Hard"
+    1597645: "Hard",
 }
 
 
-def update_playlist_page(url: str, params: dict, headers: dict, tracks: list[BPTrack]) -> tuple[str, dict]:
+def update_playlist_page(
+    url: str, params: dict, headers: dict, tracks: list[BPTrack]
+) -> tuple[str, dict]:
     r = requests.get(url, params=params, headers=headers)
     r.raise_for_status()
     playlist = r.json()
@@ -38,5 +38,4 @@ def collect_playlist(playlist_id: int, bp_token: str) -> list[BPTrack]:
     headers = {"Authorization": f"Bearer {bp_token}"}
     while url:
         url, params = update_playlist_page(url, params, headers, bp_tracks)
-    print(bp_tracks)
     return bp_tracks

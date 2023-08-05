@@ -1,5 +1,3 @@
-import requests
-import uvicorn
 from fastapi import FastAPI, Path, Query
 
 from playlists import collect_playlist
@@ -17,11 +15,4 @@ def create_user(
     bp_playlist_id: int = Path(..., gt=0), bp_token: str | None = Query(None)
 ):
     tracks = collect_playlist(bp_playlist_id, bp_token)
-
-    return {
-        "tracks": tracks
-    }
-
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="localhost", port=8000, reload=True)
+    return {"tracks": tracks}
