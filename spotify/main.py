@@ -12,8 +12,6 @@ async def root():
 
 
 @app.post("/playlists/")
-def create_user(
-    payload: PlaylistIn
-):
+def create_user(payload: PlaylistIn):
     playlist_url = create_playlist_from_bp(payload)
     return {"new_url": playlist_url}
