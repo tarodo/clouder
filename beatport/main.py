@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Path, Query
-
-from playlists import collect_playlist
+from playlists import PlaylistIn, collect_playlist, collect_playlist_spotify
 
 app = FastAPI()
 
@@ -11,8 +10,9 @@ async def root():
 
 
 @app.get("/playlists/{bp_playlist_id}")
-def create_user(
+async def create_user(
     bp_playlist_id: int = Path(..., gt=0), bp_token: str | None = Query(None)
 ):
-    tracks = collect_playlist(bp_playlist_id, bp_token)
-    return {"tracks": tracks}
+    bp_playlist = collect_playlist(bp_playlist_id, bp_token)
+    spotify_url = await collect_playlist_spotify(bp_playlist)
+    return {"bp_playlist": bp_playlist, "spotify": spotify_url}

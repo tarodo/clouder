@@ -1,5 +1,7 @@
 import requests
 from pydantic import BaseModel
+from requests import HTTPError
+from settings import bp_settings
 
 
 class BPTrack(BaseModel):
@@ -44,3 +46,13 @@ def collect_playlist(playlist_id: int, bp_token: str) -> PlaylistIn:
     while url:
         url, params = update_playlist_page(url, params, headers, bp_tracks)
     return PlaylistIn(name=playlist_name, tracks=bp_tracks)
+
+
+async def collect_playlist_spotify(playlist: PlaylistIn) -> str:
+    url = f"{bp_settings.spotify_service_url}/playlists/"
+    r = requests.post(url, data=playlist.model_dump_json())
+    try:
+        r.raise_for_status()
+    except HTTPError:
+        return "none"
+    return r.json()["new_url"]
