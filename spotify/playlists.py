@@ -12,8 +12,11 @@ def create_sp():
 
 
 def create_playlist(sp: Spotify, title: str) -> (str, str):
-    print(sp.me())
-    user_id = sp.me()["id"]
+    try:
+        print(sp.me())
+        user_id = sp.me()["id"]
+    except Exception:
+        return None, None
     playlist = sp.user_playlist_create(user_id, title)
     return playlist["id"], playlist["external_urls"]["spotify"]
 
@@ -26,4 +29,4 @@ def create_playlist_from_bp(payload: PlaylistIn):
 
 if __name__ == "__main__":
     sp = create_sp()
-    create_playlist(sp, "tttt")
+    sp.me()
