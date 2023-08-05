@@ -7,6 +7,11 @@ class BPTrack(BaseModel):
     isrc: str
 
 
+class PlaylistIn(BaseModel):
+    name: str
+    tracks: list[BPTrack]
+
+
 BASE_URL = "https://api.beatport.com/v4/my/playlists/"
 PLAYLISTS = {
     1600521: "Melodic",
@@ -30,7 +35,7 @@ def update_playlist_page(
     return next_page, dict()
 
 
-def collect_playlist(playlist_id: int, bp_token: str) -> list[BPTrack]:
+def collect_playlist(playlist_id: int, bp_token: str) -> PlaylistIn:
     playlist_name = PLAYLISTS[playlist_id]
     bp_tracks = []
     url = f"{BASE_URL}{playlist_id}/tracks/"
@@ -38,4 +43,4 @@ def collect_playlist(playlist_id: int, bp_token: str) -> list[BPTrack]:
     headers = {"Authorization": f"Bearer {bp_token}"}
     while url:
         url, params = update_playlist_page(url, params, headers, bp_tracks)
-    return bp_tracks
+    return PlaylistIn(name=playlist_name, tracks=bp_tracks)
