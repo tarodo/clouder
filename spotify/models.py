@@ -9,3 +9,9 @@ class BPTrack(BaseModel):
 class PlaylistIn(BaseModel):
     name: str
     tracks: list[BPTrack]
+
+
+class SPTrack(BaseModel):
+    name: str
+    url: str
+    sp_id: str
