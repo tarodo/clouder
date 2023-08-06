@@ -1,7 +1,12 @@
+import logging
+import urllib.parse
+
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 
 from models import PlaylistIn, SPTrack
+
+logger = logging.getLogger("spotify")
 
 
 def create_sp():
@@ -45,14 +50,17 @@ def create_playlist_from_bp(payload: PlaylistIn):
             tracks_ids.append(sp_track.sp_id)
         else:
             not_found.append(track)
-    print(tracks_ids)
-    print(f"{not_found=}")
+    for track in not_found:
+        search_str = f"{track.name} {track.authors}"
+        logger.info(
+            f"We couldn't find: {track=} || "
+            f"https://open.spotify.com/search/{urllib.parse.quote(search_str)}"
+        )
     pack_size = 100
     parts = [
         tracks_ids[i * pack_size : (i + 1) * pack_size]
         for i in range(len(tracks_ids) // pack_size + 1)
     ]
     for part in parts:
-        print(f"{part=}")
         sp.playlist_add_items(playlist_id, part)
     return playlist_url

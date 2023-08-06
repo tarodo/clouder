@@ -6,6 +6,7 @@ from settings import bp_settings
 
 class BPTrack(BaseModel):
     name: str
+    authors: str
     isrc: str
 
 
@@ -33,7 +34,8 @@ def update_playlist_page(
     next_page = playlist["next"]
     for playlist_pos in playlist["results"]:
         track = playlist_pos["track"]
-        tracks.append(BPTrack(name=track["name"], isrc=track["isrc"]))
+        authors = ", ".join([artist["name"] for artist in track["artists"]])
+        tracks.append(BPTrack(name=track["name"], authors=authors, isrc=track["isrc"]))
     return next_page, dict()
 
 

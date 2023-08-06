@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class BPTrack(BaseModel):
     name: str
+    authors: str
     isrc: str
 
 
