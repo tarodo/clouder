@@ -56,8 +56,3 @@ def create_playlist_from_bp(payload: PlaylistIn):
         print(f"{part=}")
         sp.playlist_add_items(playlist_id, part)
     return playlist_url
-
-
-if __name__ == "__main__":
-    sp = create_sp()
-    sp.me()

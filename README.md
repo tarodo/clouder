@@ -30,6 +30,10 @@ You need to create `.env` file in './bot' directory:
 ```shell
 docker-compose up --build
 ```
+For Spotify token auth use:
+```shell
+docker-compose exec spotify python reg.py
+```
 
 ### Start test
 ```shell
