@@ -12,6 +12,12 @@ class PlaylistIn(BaseModel):
     tracks: list[BPTrack]
 
 
+class SPPlaylist(BaseModel):
+    name: str
+    sp_id: str
+    url: str
+
+
 class SPTrack(BaseModel):
     name: str
     url: str

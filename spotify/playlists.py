@@ -4,7 +4,7 @@ import urllib.parse
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 
-from models import PlaylistIn, SPTrack
+from models import PlaylistIn, SPTrack, SPPlaylist
 
 logger = logging.getLogger("spotify")
 
@@ -64,3 +64,22 @@ def create_playlist_from_bp(payload: PlaylistIn):
     for part in parts:
         sp.playlist_add_items(playlist_id, part)
     return playlist_url
+
+
+def playlists_generator():
+    """Generator of all playlists"""
+    pass
+
+
+def collect_playlists_by_mask(mask: str, sp: Spotify | None = None) -> list[SPPlaylist]:
+    sp = sp if sp else create_sp()
+    playlists_meta = sp.current_user_playlists(limit=50, offset=0)
+    result = []
+    total = playlists_meta["total"]
+    print(total)
+    playlists = playlists_meta["items"]
+    for playlist in playlists:
+        sp_playlist = SPPlaylist(sp_id=playlist["id"], url=playlist["external_urls"]["spotify"], name=playlist["name"])
+        if sp_playlist.name.find("DNB") > 0:
+            result.append(sp_playlist)
+    print(result)
