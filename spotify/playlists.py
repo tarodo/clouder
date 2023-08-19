@@ -18,7 +18,6 @@ def create_sp():
 
 def create_playlist(sp: Spotify, title: str) -> (str, str):
     try:
-        print(sp.me())
         user_id = sp.me()["id"]
     except Exception:
         return None, None
@@ -76,10 +75,9 @@ def collect_playlists_by_mask(mask: str, sp: Spotify | None = None) -> list[SPPl
     playlists_meta = sp.current_user_playlists(limit=50, offset=0)
     result = []
     total = playlists_meta["total"]
-    print(total)
     playlists = playlists_meta["items"]
     for playlist in playlists:
         sp_playlist = SPPlaylist(sp_id=playlist["id"], url=playlist["external_urls"]["spotify"], name=playlist["name"])
         if sp_playlist.name.find("DNB") > 0:
             result.append(sp_playlist)
-    print(result)
+    return result
