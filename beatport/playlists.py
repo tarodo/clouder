@@ -10,6 +10,7 @@ logger = logging.getLogger("beatport")
 
 
 class BPTrack(BaseModel):
+    bp_id: int
     bp_playlist_id: int
     name: str
     authors: str
@@ -41,7 +42,7 @@ def update_playlist_page(
     for playlist_pos in playlist["results"]:
         track = playlist_pos["track"]
         authors = ", ".join([artist["name"] for artist in track["artists"]])
-        tracks.append(BPTrack(bp_playlist_id=playlist_pos["id"], name=track["name"], authors=authors, isrc=track["isrc"]))
+        tracks.append(BPTrack(bp_playlist_id=playlist_pos["id"], bp_id=track["id"], name=track["name"], authors=authors, isrc=track["isrc"]))
     return next_page, dict(), tracks
 
 
