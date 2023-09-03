@@ -1,3 +1,4 @@
+import json
 import logging
 
 import requests
@@ -60,10 +61,15 @@ def collect_playlist(playlist_id: int, bp_token: str) -> PlaylistIn:
 
 async def collect_playlist_spotify(playlist: PlaylistIn) -> str:
     url = f"{bp_settings.spotify_service_url}/playlists/"
+    logger.info(f"{playlist.model_dump_json()=}")
+    logger.info(f"{type(playlist.model_dump_json())}")
+    logger.info(f"{json.loads(playlist.model_dump_json())}")
+    logger.info(f"{type(json.loads(playlist.model_dump_json()))}")
     r = requests.post(url, data=playlist.model_dump_json())
     try:
         r.raise_for_status()
-    except HTTPError:
+    except HTTPError as e:
+        logger.error(r.json())
         return "none"
     return r.json()["new_url"]
 

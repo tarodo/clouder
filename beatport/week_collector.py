@@ -44,7 +44,7 @@ if __name__ == "__main__":
     start = "2023-02-27"
     end = "2023-03-05"
     week_number = "09"
-    bp_token = ""
+    bp_token = "TZ7vDyTuGmc8Pi3n7fmi4Na20SEsnz"
     logger.info(f"Start from {start} to {end} for {week_number} week")
     week_releases = collect_week(start, end, bp_token)
 
