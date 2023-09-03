@@ -4,7 +4,7 @@ import urllib.parse
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 
-from models import PlaylistIn, SPTrack, SPPlaylist
+from models import PlaylistIn, SPTrack, SPPlaylist, BPTrack
 
 logger = logging.getLogger("spotify")
 
@@ -19,9 +19,11 @@ def create_sp():
 def create_playlist(sp: Spotify, title: str) -> (str, str):
     try:
         user_id = sp.me()["id"]
-    except Exception:
+        logger.info(f"User ID :: {user_id}")
+    except Exception as e:
         return None, None
     playlist = sp.user_playlist_create(user_id, title)
+    logger.info(f"Created playlist :: {playlist}")
     return playlist["id"], playlist["external_urls"]["spotify"]
 
 
@@ -38,12 +40,10 @@ def get_track_by_isrc(isrc: str, sp: Spotify = None) -> SPTrack | None:
     return None
 
 
-def create_playlist_from_bp(payload: PlaylistIn):
-    sp = create_sp()
-    playlist_id, playlist_url = create_playlist(sp, payload.name)
+def add_tracks(sp: Spotify, playlist_id: str, tracks: list[BPTrack]) -> list[BPTrack]:
     tracks_ids = []
     not_found = []
-    for track in payload.tracks:
+    for track in tracks:
         sp_track = get_track_by_isrc(track.isrc, sp)
         if sp_track:
             tracks_ids.append(sp_track.sp_id)
@@ -62,12 +62,20 @@ def create_playlist_from_bp(payload: PlaylistIn):
     ]
     for part in parts:
         sp.playlist_add_items(playlist_id, part)
+    return not_found
+
+
+def create_playlist_from_bp(payload: PlaylistIn):
+    sp = create_sp()
+    playlist_id, playlist_url = create_playlist(sp, payload.name)
+    error_tracks = add_tracks(sp, playlist_id, payload.tracks)
     return playlist_url
 
 
-def playlists_generator():
-    """Generator of all playlists"""
-    pass
+def create_one_playlist(playlist_name: str) -> SPPlaylist:
+    sp = create_sp()
+    playlist_id, playlist_url = create_playlist(sp, playlist_name)
+    return SPPlaylist(sp_id=playlist_id, url=playlist_url, name=playlist_name)
 
 
 def collect_playlists_by_mask(mask: str, sp: Spotify | None = None) -> list[SPPlaylist]:

@@ -2,6 +2,8 @@ from pydantic import BaseModel
 
 
 class BPTrack(BaseModel):
+    bp_id: int
+    bp_playlist_id: int
     name: str
     authors: str
     isrc: str
