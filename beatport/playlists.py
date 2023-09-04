@@ -59,19 +59,40 @@ def collect_playlist(playlist_id: int, bp_token: str) -> PlaylistIn:
     return PlaylistIn(name=playlist_name, tracks=bp_tracks)
 
 
-async def collect_playlist_spotify(playlist: PlaylistIn) -> str:
-    url = f"{bp_settings.spotify_service_url}/playlists/"
-    logger.info(f"{playlist.model_dump_json()=}")
-    logger.info(f"{type(playlist.model_dump_json())}")
-    logger.info(f"{json.loads(playlist.model_dump_json())}")
-    logger.info(f"{type(json.loads(playlist.model_dump_json()))}")
-    r = requests.post(url, data=playlist.model_dump_json())
+def get_new_sp_playlist(name: str) -> dict | None:
+    new_playlist_url = f"{bp_settings.spotify_service_url}/playlists/empty/{name}/"
+    r = requests.post(new_playlist_url)
     try:
         r.raise_for_status()
-    except HTTPError as e:
+    except HTTPError:
         logger.error(r.json())
+        return
+    return r.json()
+
+
+async def collect_playlist_spotify(playlist: PlaylistIn) -> str:
+    sp_playlist = get_new_sp_playlist(playlist.name)
+    if sp_playlist is None:
         return "none"
-    return r.json()["new_url"]
+
+    url = f"{bp_settings.spotify_service_url}/playlists/{sp_playlist['sp_id']}/tracks"
+    tracks = playlist.tracks
+
+    pack_size = 20
+    parts = [
+        tracks[i * pack_size : (i + 1) * pack_size]
+        for i in range(len(tracks) // pack_size + 1)
+    ]
+    for part in parts:
+        part = [track.model_dump() for track in part]
+        tracks = {"tracks": part}
+        r = requests.post(url, json=tracks)
+        try:
+            r.raise_for_status()
+        except HTTPError as e:
+            logger.error(r.json())
+            return "none"
+    return sp_playlist["url"]
 
 
 def remove_tracks_from_playlist(playlist_id: int, tracks_id: list[int], bp_token: str):

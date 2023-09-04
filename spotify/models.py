@@ -9,6 +9,10 @@ class BPTrack(BaseModel):
     isrc: str
 
 
+class BPTracks(BaseModel):
+    tracks: list[BPTrack]
+
+
 class PlaylistIn(BaseModel):
     name: str
     tracks: list[BPTrack]
