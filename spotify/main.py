@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import FastAPI, Path, Body
-from playlists import create_playlist_from_bp, get_track_by_isrc, create_one_playlist
+from playlists import create_playlist_from_bp, get_track_by_isrc, create_one_playlist, handle_tracks_from_bp
 
 from models import PlaylistIn, SPPlaylist, BPTrack
 
@@ -31,7 +31,8 @@ def create_empty_playlist(playlist_name: str = Path(...)):
 
 @app.post("/playlists/{playlist_id}/tracks")
 def add_tracks_to_playlist(playlist_id: str = Path(...), tracks: list[BPTrack] = Body(...)):
-    pass
+    result = handle_tracks_from_bp(playlist_id, tracks)
+    return {"result": result}
 
 
 @app.post("/playlists/")

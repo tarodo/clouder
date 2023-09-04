@@ -78,6 +78,12 @@ def create_one_playlist(playlist_name: str) -> SPPlaylist:
     return SPPlaylist(sp_id=playlist_id, url=playlist_url, name=playlist_name)
 
 
+def handle_tracks_from_bp(playlist_id: str, tracks: list[BPTrack]):
+    sp = create_sp()
+    error_tracks = add_tracks(sp, playlist_id, tracks)
+    return True
+
+
 def collect_playlists_by_mask(mask: str, sp: Spotify | None = None) -> list[SPPlaylist]:
     sp = sp if sp else create_sp()
     playlists_meta = sp.current_user_playlists(limit=50, offset=0)
