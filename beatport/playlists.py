@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 
 import requests
 from pydantic import BaseModel
@@ -24,7 +25,7 @@ class PlaylistIn(BaseModel):
 
 
 BASE_URL = "https://api.beatport.com/v4/my/playlists/"
-PLAYLISTS = {
+PLAYLISTS_DNB = {
     1600521: "Melodic",
     1597656: "Party",
     1597654: "ReDrum",
@@ -49,7 +50,7 @@ def update_playlist_page(
 
 def collect_playlist(playlist_id: int, bp_token: str) -> PlaylistIn:
     logger.info(f"Start collect playlist with ID : {playlist_id} :: BP Token : {bp_token}")
-    playlist_name = PLAYLISTS[playlist_id]
+    playlist_name = PLAYLISTS_DNB[playlist_id]
     bp_tracks = []
     url = f"{BASE_URL}{playlist_id}/tracks/"
     params = {"page": 1, "per_page": 10}
@@ -81,9 +82,11 @@ async def collect_playlist_spotify(playlist: PlaylistIn) -> str:
     pack_size = 20
     parts = [
         tracks[i * pack_size : (i + 1) * pack_size]
-        for i in range(len(tracks) // pack_size + 1)
+        for i in range(math.ceil(len(tracks) / pack_size))
     ]
+    logger.debug(f"All parts from BP :: {parts}")
     for part in parts:
+        logger.debug(f"Wanna send to SP :: {part}")
         part = [track.model_dump() for track in part]
         tracks = {"tracks": part}
         r = requests.post(url, json=tracks)

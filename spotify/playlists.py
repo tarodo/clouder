@@ -1,4 +1,5 @@
 import logging
+import math
 import urllib.parse
 
 from spotipy import Spotify
@@ -58,9 +59,11 @@ def add_tracks(sp: Spotify, playlist_id: str, tracks: list[BPTrack]) -> list[BPT
     pack_size = 100
     parts = [
         tracks_ids[i * pack_size : (i + 1) * pack_size]
-        for i in range(len(tracks_ids) // pack_size + 1)
+        for i in range(math.ceil(len(tracks_ids) / pack_size))
     ]
+    logger.debug(f"All parts :: {parts}")
     for part in parts:
+        logger.debug(f"Wanna add to Playlist :: {playlist_id} :: data :: {part}")
         sp.playlist_add_items(playlist_id, part)
     return not_found
 

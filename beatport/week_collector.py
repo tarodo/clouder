@@ -3,7 +3,7 @@ import csv
 import requests
 from pydantic import BaseModel
 
-from playlists import PLAYLISTS, collect_playlist
+from playlists import PLAYLISTS_DNB, collect_playlist
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("weeker")
@@ -54,10 +54,10 @@ if __name__ == "__main__":
             line = [release.bp_id, release.name, release.release_date, release.url]
             csvwriter.writerow(line)
 
-    playlists_id = PLAYLISTS.keys()
+    playlists_id = PLAYLISTS_DNB.keys()
     for playlist_id in playlists_id:
         playlist = collect_playlist(playlist_id, bp_token)
-        with open(f"DNB_{week_number}_{PLAYLISTS.get(playlist_id)}.csv", 'w', newline='', encoding='utf-8') as playlist_file:
+        with open(f"DNB_{week_number}_{PLAYLISTS_DNB.get(playlist_id)}.csv", 'w', newline='', encoding='utf-8') as playlist_file:
             csvwriter = csv.writer(playlist_file)
             for track in playlist.tracks:
                 line = [track.bp_id, track.name, track.isrc]
