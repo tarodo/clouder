@@ -1,4 +1,3 @@
-import json
 import logging
 import math
 
@@ -6,7 +5,6 @@ import requests
 from pydantic import BaseModel
 from requests import HTTPError
 from settings import bp_settings
-
 
 logger = logging.getLogger("beatport")
 
@@ -35,7 +33,7 @@ PLAYLISTS_DNB = {
 
 
 def update_playlist_page(
-        url: str, params: dict, headers: dict, tracks: list[BPTrack]
+    url: str, params: dict, headers: dict, tracks: list[BPTrack]
 ) -> tuple[str, dict, list[BPTrack]]:
     r = requests.get(url, params=params, headers=headers)
     r.raise_for_status()
@@ -44,12 +42,22 @@ def update_playlist_page(
     for playlist_pos in playlist["results"]:
         track = playlist_pos["track"]
         authors = ", ".join([artist["name"] for artist in track["artists"]])
-        tracks.append(BPTrack(bp_playlist_id=playlist_pos["id"], bp_id=track["id"], name=track["name"], authors=authors, isrc=track["isrc"]))
+        tracks.append(
+            BPTrack(
+                bp_playlist_id=playlist_pos["id"],
+                bp_id=track["id"],
+                name=track["name"],
+                authors=authors,
+                isrc=track["isrc"],
+            )
+        )
     return next_page, dict(), tracks
 
 
 def collect_playlist(playlist_id: int, bp_token: str) -> PlaylistIn:
-    logger.info(f"Start collect playlist with ID : {playlist_id} :: BP Token : {bp_token}")
+    logger.info(
+        f"Start collect playlist with ID : {playlist_id} :: BP Token : {bp_token}"
+    )
     playlist_name = PLAYLISTS_DNB[playlist_id]
     bp_tracks = []
     url = f"{BASE_URL}{playlist_id}/tracks/"

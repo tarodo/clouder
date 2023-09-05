@@ -1,9 +1,9 @@
-import logging
 import csv
-import requests
-from pydantic import BaseModel
+import logging
 
+import requests
 from playlists import PLAYLISTS_DNB, collect_playlist
+from pydantic import BaseModel
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("weeker")
@@ -23,17 +23,32 @@ def update_releases(url, params, headers, releases):
     r = requests.get(url, params=params, headers=headers)
     r.raise_for_status()
     release_page = r.json()
-    next_page = release_page['next']
+    next_page = release_page["next"]
     for release in release_page["results"]:
-        releases.append(BPRelease(bp_id=release["id"], name=release["name"], url=release["url"], release_date=release["new_release_date"]))
+        releases.append(
+            BPRelease(
+                bp_id=release["id"],
+                name=release["name"],
+                url=release["url"],
+                release_date=release["new_release_date"],
+            )
+        )
     return next_page, dict(), releases
 
 
 def collect_week(start_date: str, end_date: str, bp_token: str) -> list:
-    logger.info(f"Start collect week from : {start_date} : to : {end_date} :: BP Token : {bp_token}")
+    logger.info(
+        f"Start collect week from : {start_date} : to : {end_date} :: BP Token : {bp_token}"
+    )
     releases = []
     url = f"https://api.beatport.com/v4/catalog/releases/"
-    params = {"genre_id": 1, "publish_date": f"{start_date}:{end_date}", "page": 1, "per_page": 100, "order_by": "-publish_date"}
+    params = {
+        "genre_id": 1,
+        "publish_date": f"{start_date}:{end_date}",
+        "page": 1,
+        "per_page": 100,
+        "order_by": "-publish_date",
+    }
     headers = {"Authorization": f"Bearer {bp_token}"}
     while url:
         url, params, releases = update_releases(url, params, headers, releases)
@@ -48,7 +63,7 @@ if __name__ == "__main__":
     logger.info(f"Start from {start} to {end} for {week_number} week")
     week_releases = collect_week(start, end, bp_token)
 
-    with open(f"DNB_{week_number}.csv", 'w', newline='', encoding='utf-8') as csvfile:
+    with open(f"DNB_{week_number}.csv", "w", newline="", encoding="utf-8") as csvfile:
         csvwriter = csv.writer(csvfile)
         for release in week_releases:
             line = [release.bp_id, release.name, release.release_date, release.url]
@@ -57,7 +72,12 @@ if __name__ == "__main__":
     playlists_id = PLAYLISTS_DNB.keys()
     for playlist_id in playlists_id:
         playlist = collect_playlist(playlist_id, bp_token)
-        with open(f"DNB_{week_number}_{PLAYLISTS_DNB.get(playlist_id)}.csv", 'w', newline='', encoding='utf-8') as playlist_file:
+        with open(
+            f"DNB_{week_number}_{PLAYLISTS_DNB.get(playlist_id)}.csv",
+            "w",
+            newline="",
+            encoding="utf-8",
+        ) as playlist_file:
             csvwriter = csv.writer(playlist_file)
             for track in playlist.tracks:
                 line = [track.bp_id, track.name, track.isrc]

@@ -1,7 +1,8 @@
 import logging
 
 from fastapi import FastAPI, Path, Query
-from playlists import collect_playlist, collect_playlist_spotify, remove_tracks_from_playlist, PLAYLISTS_DNB
+from playlists import (PLAYLISTS_DNB, collect_playlist,
+                       collect_playlist_spotify, remove_tracks_from_playlist)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
@@ -26,7 +27,7 @@ async def move_to_spotify_dnb(bp_token: str = Query(...)):
     return {"playlists": new_sp_playlists}
 
 
-@app.get("/playlists/{bp_playlist_id}")
+@app.post("/playlists/{bp_playlist_id}/")
 async def create_user(
     bp_playlist_id: int = Path(..., gt=0), bp_token: str | None = Query(None)
 ):
@@ -35,11 +36,27 @@ async def create_user(
     return {"bp_playlist": bp_playlist, "spotify": spotify_url}
 
 
-@app.post("/playlists/{bp_playlist_id}/clear/{bp_token}/")
+@app.post("/playlists/dnb/clear/")
+async def clear_playlist(bp_token: str = Query(...)):
+    remove_results = []
+    for bp_playlist_id in PLAYLISTS_DNB.keys():
+        bp_playlist = collect_playlist(bp_playlist_id, bp_token)
+        tracks_id = [track.bp_playlist_id for track in bp_playlist.tracks]
+        result = remove_tracks_from_playlist(
+            playlist_id=bp_playlist_id, tracks_id=tracks_id, bp_token=bp_token
+        )
+        remove_results.append(result)
+
+    return remove_results
+
+
+@app.post("/playlists/{bp_playlist_id}/clear/")
 async def clear_playlist(
-    bp_playlist_id: int = Path(..., gt=0), bp_token: str = Path(...)
+    bp_playlist_id: int = Path(..., gt=0), bp_token: str = Query(...)
 ):
     bp_playlist = collect_playlist(bp_playlist_id, bp_token)
     tracks_id = [track.bp_playlist_id for track in bp_playlist.tracks]
-    result = remove_tracks_from_playlist(playlist_id=bp_playlist_id, tracks_id=tracks_id, bp_token=bp_token)
+    result = remove_tracks_from_playlist(
+        playlist_id=bp_playlist_id, tracks_id=tracks_id, bp_token=bp_token
+    )
     print(result)

@@ -5,7 +5,7 @@ import urllib.parse
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 
-from models import PlaylistIn, SPTrack, SPPlaylist, BPTrack
+from models import BPTrack, PlaylistIn, SPPlaylist, SPTrack
 
 logger = logging.getLogger("spotify")
 
@@ -53,7 +53,7 @@ def add_tracks(sp: Spotify, playlist_id: str, tracks: list[BPTrack]) -> list[BPT
     for track in not_found:
         search_str = f"{track.name} {track.authors}"
         logger.info(
-            f"We couldn't find: {track=} || "
+            f"We couldn't find: {track=} || For {playlist_id} || "
             f"https://open.spotify.com/search/{urllib.parse.quote(search_str)}"
         )
     pack_size = 100
@@ -94,7 +94,11 @@ def collect_playlists_by_mask(mask: str, sp: Spotify | None = None) -> list[SPPl
     total = playlists_meta["total"]
     playlists = playlists_meta["items"]
     for playlist in playlists:
-        sp_playlist = SPPlaylist(sp_id=playlist["id"], url=playlist["external_urls"]["spotify"], name=playlist["name"])
+        sp_playlist = SPPlaylist(
+            sp_id=playlist["id"],
+            url=playlist["external_urls"]["spotify"],
+            name=playlist["name"],
+        )
         if sp_playlist.name.find("DNB") > 0:
             result.append(sp_playlist)
     return result

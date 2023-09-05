@@ -1,8 +1,10 @@
-from playlists import create_sp
 import os
+
+from playlists import create_sp
 
 if not os.getenv("SPOTIPY_CLIENT_ID"):
     from environs import Env
+
     env = Env()
     env.read_env()
 

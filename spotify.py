@@ -1,5 +1,6 @@
 import logging
 import re
+from datetime import date
 from time import sleep
 
 from spotipy import Spotify, SpotifyOAuth
@@ -7,8 +8,6 @@ from spotipy import Spotify, SpotifyOAuth
 from common import clear_artists_name
 from models import (BeatportPlaylistModel, BeatportTrackModel,
                     SpotifyArtistModel, SpotifyTrackModel)
-
-from datetime import date
 
 logger = logging.getLogger("spotify")
 logger.setLevel(logging.DEBUG)

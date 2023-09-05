@@ -1,9 +1,10 @@
 import logging
 
-from fastapi import FastAPI, Path, Body
-from playlists import create_playlist_from_bp, get_track_by_isrc, create_one_playlist, handle_tracks_from_bp
+from fastapi import Body, FastAPI, Path
+from playlists import (create_one_playlist, create_playlist_from_bp,
+                       get_track_by_isrc, handle_tracks_from_bp)
 
-from models import PlaylistIn, SPPlaylist, BPTrack, BPTracks
+from models import BPTrack, BPTracks, PlaylistIn, SPPlaylist
 
 app = FastAPI()
 
@@ -23,7 +24,9 @@ async def root():
     return {"message": "Hello Spotify"}
 
 
-@app.post("/playlists/empty/{playlist_name}/", response_model=SPPlaylist, status_code=200)
+@app.post(
+    "/playlists/empty/{playlist_name}/", response_model=SPPlaylist, status_code=200
+)
 def create_empty_playlist(playlist_name: str = Path(...)):
     playlist = create_one_playlist(playlist_name)
     return playlist

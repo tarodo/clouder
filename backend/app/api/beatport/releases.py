@@ -141,7 +141,10 @@ def remove(
 
 
 @router.post(
-    "/{release_id}/audited", response_model=ReleaseOut, status_code=200, responses=responses
+    "/{release_id}/audited",
+    response_model=ReleaseOut,
+    status_code=200,
+    responses=responses,
 )
 def make_audited(
     release_id: int = Path(..., gt=0),
