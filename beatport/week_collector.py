@@ -23,6 +23,10 @@ def update_releases(url, params, headers, releases):
     r = requests.get(url, params=params, headers=headers)
     r.raise_for_status()
     release_page = r.json()
+    page_num = release_page['page'].replace("/", "_")
+    print(page_num)
+    with open(f"weeker_{page_num}.json", "w", encoding="utf-8") as json_file:
+        json_file.write(r.text)
     next_page = release_page["next"]
     for release in release_page["results"]:
         releases.append(
@@ -69,16 +73,16 @@ if __name__ == "__main__":
             line = [release.bp_id, release.name, release.release_date, release.url]
             csvwriter.writerow(line)
 
-    playlists_id = PLAYLISTS_DNB.keys()
-    for playlist_id in playlists_id:
-        playlist = collect_playlist(playlist_id, bp_token)
-        with open(
-            f"DNB_{week_number}_{PLAYLISTS_DNB.get(playlist_id)}.csv",
-            "w",
-            newline="",
-            encoding="utf-8",
-        ) as playlist_file:
-            csvwriter = csv.writer(playlist_file)
-            for track in playlist.tracks:
-                line = [track.bp_id, track.name, track.isrc]
-                csvwriter.writerow(line)
+    # playlists_id = PLAYLISTS_DNB.keys()
+    # for playlist_id in playlists_id:
+    #     playlist = collect_playlist(playlist_id, bp_token)
+    #     with open(
+    #         f"DNB_{week_number}_{PLAYLISTS_DNB.get(playlist_id)}.csv",
+    #         "w",
+    #         newline="",
+    #         encoding="utf-8",
+    #     ) as playlist_file:
+    #         csvwriter = csv.writer(playlist_file)
+    #         for track in playlist.tracks:
+    #             line = [track.bp_id, track.name, track.isrc]
+    #             csvwriter.writerow(line)
