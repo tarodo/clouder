@@ -1,5 +1,7 @@
 import csv
+import json
 import logging
+import os
 
 import requests
 from playlists import PLAYLISTS_DNB, collect_playlist
@@ -7,6 +9,8 @@ from pydantic import BaseModel
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("weeker")
+
+DATA_DIR = "data"
 
 
 class BPRelease(BaseModel):
@@ -16,7 +20,7 @@ class BPRelease(BaseModel):
     release_date: str
 
 
-def update_releases(url, params, headers, releases):
+def update_releases(url, params, headers, releases, week_number):
     logger.info(f"Try get: {url=}")
     if not url.startswith("https://"):
         url = f"https://{url}"
@@ -25,8 +29,8 @@ def update_releases(url, params, headers, releases):
     release_page = r.json()
     page_num = release_page['page'].replace("/", "_")
     print(page_num)
-    with open(f"weeker_{page_num}.json", "w", encoding="utf-8") as json_file:
-        json_file.write(r.text)
+    with open(f"{DATA_DIR}/{week_number}/weeker{page_num}.json", 'w') as f:
+        json.dump(r.json(), f, indent=4)
     next_page = release_page["next"]
     for release in release_page["results"]:
         releases.append(
@@ -40,7 +44,7 @@ def update_releases(url, params, headers, releases):
     return next_page, dict(), releases
 
 
-def collect_week(start_date: str, end_date: str, bp_token: str) -> list:
+def collect_week(start_date: str, end_date: str, bp_token: str, week_number: str) -> list:
     logger.info(
         f"Start collect week from : {start_date} : to : {end_date} :: BP Token : {bp_token}"
     )
@@ -55,7 +59,7 @@ def collect_week(start_date: str, end_date: str, bp_token: str) -> list:
     }
     headers = {"Authorization": f"Bearer {bp_token}"}
     while url:
-        url, params, releases = update_releases(url, params, headers, releases)
+        url, params, releases = update_releases(url, params, headers, releases, week_number)
     return releases
 
 
@@ -63,11 +67,12 @@ if __name__ == "__main__":
     start = "2023-02-27"
     end = "2023-03-05"
     week_number = "09"
-    bp_token = "TZ7vDyTuGmc8Pi3n7fmi4Na20SEsnz"
+    os.makedirs(os.path.join(DATA_DIR, str(week_number)), exist_ok=True)
+    bp_token = "23b8f1f1-1f1f-4f1f-8f1f-1f1f1f1f1f1f"
     logger.info(f"Start from {start} to {end} for {week_number} week")
-    week_releases = collect_week(start, end, bp_token)
+    week_releases = collect_week(start, end, bp_token, week_number)
 
-    with open(f"DNB_{week_number}.csv", "w", newline="", encoding="utf-8") as csvfile:
+    with open(f"{DATA_DIR}\\DNB_{week_number}.csv", "w", newline="", encoding="utf-8") as csvfile:
         csvwriter = csv.writer(csvfile)
         for release in week_releases:
             line = [release.bp_id, release.name, release.release_date, release.url]
