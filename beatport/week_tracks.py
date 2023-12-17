@@ -79,6 +79,27 @@ def handle_week_tracks(full_week_path: Path, raw_tracks_path: Path, bp_token: st
         handle_one_release(release, raw_tracks_path, bp_token)
 
 
+def collect_tracks_info(raw_tracks_path: Path):
+    tracks = []
+    for release_file in raw_tracks_path.iterdir():
+        with open(release_file, 'r') as f:
+            data = json.load(f)
+        print(f"Count : {data['count']}")
+        for item in data['results']:
+            track = {
+                'artists': item['artists'],
+                'id': item['id'],
+                'isrc': item['isrc'],
+                'mix_name': item['mix_name'],
+                'name': item['name'],
+                'new_release_date': item['new_release_date'],
+                'publish_date': item['publish_date'],
+            }
+            if item['genre']['id'] != 1:
+                continue
+            tracks.append(track)
+    return tracks
+
 def handle_week(week_num: int, style_id: int, bp_token: str):
     week_num = str(week_num).zfill(2)
     style_name = BP_STYLES.get(style_id)
@@ -95,6 +116,8 @@ def handle_week(week_num: int, style_id: int, bp_token: str):
         json.dump(releases, f, indent=4)
 
     handle_week_tracks(full_week_path, raw_tracks_path, bp_token)
+    tracks = collect_tracks_info(raw_tracks_path)
+    print(len(tracks))
 
 
 if __name__ == "__main__":
