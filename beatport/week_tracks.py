@@ -1,15 +1,15 @@
 import json
 import os
+from pathlib import Path
 from pprint import pprint
 
+from week_collector import DATA_DIR, BP_STYLES
 
-DATA_DIR = "data"
 
-def handle_week(week_num: int):
+def collect_essential_week(raw_dir_path: Path):
     releases = []
-    folder_path = f"{DATA_DIR}/{week_num}"
-    for filename in os.listdir(folder_path):
-        with open(f"{folder_path}/{filename}", 'r') as f:
+    for week_page in raw_dir_path.iterdir():
+        with open(week_page, 'r') as f:
             data = json.load(f)
 
         for item in data['results']:
@@ -49,10 +49,23 @@ def handle_week(week_num: int):
                 'track_count': item['track_count']
             }
             releases.append(release)
-    with open(f"{folder_path}/full_week.json", 'w') as f:
+    return releases
+
+
+def collect_whole_week(week_dir_path: Path):
+    raw_dir_path = week_dir_path / "week_raw"
+    result_path = week_dir_path / "full_week.json"
+
+    releases = collect_essential_week(raw_dir_path)
+    with open(result_path, 'w') as f:
         json.dump(releases, f, indent=4)
 
-    pprint(releases)
+
+def handle_week(week_num: int, style_id: int):
+    week_num = str(week_num).zfill(2)
+    style_name = BP_STYLES.get(style_id)
+    releases_path = Path(DATA_DIR) / style_name / week_num
+    collect_whole_week(releases_path)
 
 
 def handle_week_tracks(week_num: int):
@@ -66,10 +79,5 @@ def handle_week_tracks(week_num: int):
         pass
 
 
-
-
-
-
 if __name__ == "__main__":
-    handle_week("09")
-    # handle_week_tracks("09")
+    handle_week(9, 1)

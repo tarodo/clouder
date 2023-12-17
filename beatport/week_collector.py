@@ -21,6 +21,7 @@ class BPRelease(BaseModel):
     url: str
     release_date: str
 
+
 BP_STYLES = {
     1: "DNB",
 }
